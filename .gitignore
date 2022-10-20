@@ -1,0 +1,13 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*_cache
+*_files
+*.log
+*.aux
+*.toc
+*.nav
+*.out
+*.snm
+*.vrb

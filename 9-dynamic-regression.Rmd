@@ -1,0 +1,550 @@
+---
+title: "Time Series Analysis & Forecasting Using R"
+author: "9. Dynamic regression"
+toc: true
+classoption: aspectratio=169
+titlepage: title16x9.png
+titlecolor: burntorange
+output:
+  binb::monash:
+    colortheme: monashwhite
+    fig_width: 7
+    fig_height: 3.5
+    includes:
+      in_header: header.tex
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE,
+  dev.args = list(bg = grey(0.9), pointsize = 11)
+)
+library(fpp3)
+
+vic_elec_daily <- vic_elec %>%
+  filter(year(Time) == 2014) %>%
+  index_by(Date = date(Time)) %>%
+  summarise(
+    Demand = sum(Demand) / 1e3,
+    Temperature = max(Temperature),
+    Holiday = any(Holiday)
+  ) %>%
+  mutate(Day_Type = case_when(
+    Holiday ~ "Holiday",
+    wday(Date) %in% 2:6 ~ "Weekday",
+    TRUE ~ "Weekend"
+  ))
+```
+
+# Regression with ARIMA errors
+
+## Regression with ARIMA errors
+\fontsize{13}{15}\sf
+
+\begin{block}{Regression models}\vspace*{-0.2cm}
+\[
+  y_t = \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + \varepsilon_t,
+\]
+\end{block}
+
+  * $y_t$ modeled as function of $k$ explanatory variables
+  * In regression, we assume that $\varepsilon_t$ is white noise.
+\vspace*{0.3cm}
+\pause
+\begin{alertblock}{RegARIMA model}\vspace*{-0.2cm}
+\begin{align*}
+  y_t &= \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + \eta_t,\\
+      \eta_t &\sim \text{ARIMA}
+\end{align*}
+\end{alertblock}
+
+  * Residuals are from ARIMA model.
+  * Estimate model in one step using MLE
+  * Select model with lowest AICc value.
+
+## US personal consumption and income
+\fontsize{9}{10}\sf
+
+```{r usconsumpdata, echo=TRUE}
+us_change
+```
+
+## US personal consumption and income
+
+```{r usconsump, fig.height=6, fig.width=8.5}
+us_change %>%
+  pivot_longer(-Quarter, names_to = "variable", values_to = "value") %>%
+  ggplot(aes(y = value, x = Quarter, group = variable)) +
+  geom_line() + facet_grid(variable ~ ., scales = "free_y") +
+  xlab("Year") + ylab("") +
+  ggtitle("Quarterly changes in US consumption and personal income")
+```
+
+## US personal consumption and income
+\fontsize{9}{10}\sf
+
+```{r usconsump_pairs, fig.height=6, fig.width=8.5, echo=TRUE}
+us_change %>% as_tibble() %>% select(-Quarter) %>% GGally::ggpairs()
+```
+
+## US personal consumption and income
+
+  * No need for transformations or further differencing.
+  *  Increase in income does not necessarily translate into instant increase in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). We will ignore this for now.
+
+## US personal consumption and income
+\fontsize{8}{9}\sf
+
+```{r usconsump2, echo=TRUE, fig.height=3}
+fit <- us_change %>%
+  model(regarima = ARIMA(Consumption ~ Income + Production + Savings + Unemployment))
+report(fit)
+```
+
+\fontsize{13}{14}\sf\pause\begin{alertblock}{}
+Write down the equations for the fitted model.
+\end{alertblock}
+
+## US personal consumption and income
+\fontsize{8}{9}\sf
+
+```{r , echo=TRUE, fig.height=3.7, dependson='usconsump2'}
+gg_tsresiduals(fit)
+```
+
+## US personal consumption and income
+\fontsize{8}{9}\sf
+
+```{r , echo=TRUE, fig.height=3.7, dependson='usconsump2'}
+augment(fit) %>%
+  features(.resid, ljung_box, dof = 6, lag = 12)
+```
+
+## US personal consumption and income
+\fontsize{8}{8}\sf
+
+```{r usconsump3, echo=TRUE, fig.height=3, dependson='usconsump2'}
+us_change_future <- new_data(us_change, 8) %>%
+  mutate(Income = tail(us_change$Income,1),
+         Production =tail(us_change$Production,1),
+         Savings = tail(us_change$Savings,1),
+         Unemployment = tail(us_change$Unemployment,1))
+forecast(fit, new_data = us_change_future) %>%
+  autoplot(us_change) +
+  labs(x = "Year", y = "Percentage change",
+       title = "Forecasts from regression with ARIMA errors")
+```
+
+## Forecasting
+
+  * To forecast a regression model with ARIMA errors, we need to forecast the
+regression part of the model and the ARIMA part of the model and combine the
+results.
+  * Some predictors are known into the future (e.g., time, dummies).
+  * Separate forecasting models may be needed for other predictors.
+  * Forecast intervals ignore the uncertainty in forecasting the predictors.
+
+## Daily electricity demand
+\fontsize{12}{13}\sf
+
+Model daily electricity demand as a function of temperature using quadratic regression with ARMA errors.
+
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE, fig.height=3}
+vic_elec_daily %>%
+  ggplot(aes(x = Temperature, y = Demand, colour = Day_Type)) +
+  geom_point() +
+  labs(x = "Maximum temperature", y = "Electricity demand (GW)")
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE, fig.height=3.6}
+vic_elec_daily %>%
+  pivot_longer(c(Demand, Temperature)) %>%
+  ggplot(aes(x = Date, y = value)) + geom_line() +
+  facet_grid(vars(name), scales = "free_y")
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r dailymodel, echo=TRUE}
+fit <- vic_elec_daily %>%
+  model(fit = ARIMA(Demand ~ Temperature + I(Temperature^2) +
+    (Day_Type == "Weekday")))
+report(fit)
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE, dependson='dailymodel'}
+augment(fit) %>%
+  gg_tsdisplay(.resid, plot_type = "histogram")
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE, dependson='dailymodel'}
+augment(fit) %>%
+  features(.resid, ljung_box, dof = 9, lag = 14)
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE, dependson='dailymodel'}
+# Forecast one day ahead
+vic_next_day <- new_data(vic_elec_daily, 1) %>%
+  mutate(Temperature = 26, Day_Type = "Holiday")
+forecast(fit, vic_next_day)
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo=TRUE}
+vic_elec_future <- new_data(vic_elec_daily, 14) %>%
+  mutate(
+    Temperature = 26,
+    Holiday = c(TRUE, rep(FALSE, 13)),
+    Day_Type = case_when(
+      Holiday ~ "Holiday",
+      wday(Date) %in% 2:6 ~ "Weekday",
+      TRUE ~ "Weekend"
+  )
+)
+```
+
+## Daily electricity demand
+\fontsize{8}{9}\sf
+
+```{r, echo = TRUE, dependson='dailymodel'}
+forecast(fit, vic_elec_future) %>%
+  autoplot(vic_elec_daily) + ylab("Electricity demand (GW)")
+```
+
+# Lab Session 18
+## Lab Session 18
+\fontsize{11}{12}\sf
+
+Repeat the daily electricity example, but instead of using a quadratic function of temperature, use a piecewise linear function with the "knot" around 20 degrees Celsius (use predictors `Temperature` & `Temp2`). How can you optimize the choice of knot?
+
+The data can be created as follows.
+
+\vspace*{-0.2cm}\fontsize{9}{9.5}\sf
+
+```{r echo=TRUE, eval=FALSE}
+vic_elec_daily <- vic_elec %>%
+  filter(year(Time) == 2014) %>%
+  index_by(Date = date(Time)) %>%
+  summarise(
+    Demand = sum(Demand) / 1e3,
+    Temperature = max(Temperature),
+    Holiday = any(Holiday)
+  ) %>%
+  mutate(
+    Temp2 = I(pmax(Temperature - 20, 0)),
+    Day_Type = case_when(
+      Holiday ~ "Holiday",
+      wday(Date) %in% 2:6 ~ "Weekday",
+      TRUE ~ "Weekend"))
+```
+
+# Dynamic harmonic regression
+
+## Dynamic harmonic regression
+
+ **Combine Fourier terms with ARIMA errors**
+
+\fontsize{13}{14}\sf
+
+### Advantages
+   * it allows any length seasonality;
+   * for data with more than one seasonal period, you can include Fourier terms of different frequencies;
+   * the seasonal pattern is smooth for small values of $K$ (but more wiggly seasonality can be handled by increasing $K$);
+   * the short-term dynamics are easily handled with a simple ARMA error.
+
+### Disadvantages
+ * seasonality is assumed to be fixed
+
+## Eating-out expenditure
+\fontsize{8}{9}\sf
+
+```{r cafe, echo=TRUE, fig.height=3.5, fig.width=8}
+aus_cafe <- aus_retail %>%
+  filter(
+    Industry == "Cafes, restaurants and takeaway food services",
+    year(Month) %in% 2004:2018
+  ) %>%
+  summarise(Turnover = sum(Turnover))
+aus_cafe %>% autoplot(Turnover)
+```
+
+## Eating-out expenditure
+
+\fontsize{9}{10}\sf
+
+```{r cafefit, dependson='cafe', fig.height=5, echo=TRUE, results='hide'}
+fit <- aus_cafe %>% model(
+  `K = 1` = ARIMA(log(Turnover) ~ fourier(K = 1) + PDQ(0, 0, 0)),
+  `K = 2` = ARIMA(log(Turnover) ~ fourier(K = 2) + PDQ(0, 0, 0)),
+  `K = 3` = ARIMA(log(Turnover) ~ fourier(K = 3) + PDQ(0, 0, 0)),
+  `K = 4` = ARIMA(log(Turnover) ~ fourier(K = 4) + PDQ(0, 0, 0)),
+  `K = 5` = ARIMA(log(Turnover) ~ fourier(K = 5) + PDQ(0, 0, 0)),
+  `K = 6` = ARIMA(log(Turnover) ~ fourier(K = 6) + PDQ(0, 0, 0))
+)
+glance(fit)
+```
+```{r, echo = FALSE}
+glance(fit) %>%
+  select(.model, sigma2, log_lik, AIC, AICc, BIC) %>%
+  knitr::kable()
+```
+
+## Eating-out expenditure
+
+```{r}
+cafe_plot <- function(...) {
+  fit %>%
+    select(...) %>%
+    forecast() %>%
+    autoplot(aus_cafe) +
+    ggtitle(sprintf("Log transformed %s, fourier(K = %s)", model_sum(select(fit, ...)[[1]][[1]]), deparse(..1))) +
+    geom_label(
+      aes(x = yearmonth("2007 Jan"), y = 4250, label = paste0("AICc = ", format(AICc))),
+      data = glance(select(fit, ...))
+    ) +
+    geom_line(aes(y = .fitted), colour = "red", augment(select(fit, ...))) +
+    ylim(c(1500, 5100))
+}
+```
+
+```{r cafe1, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 1")
+```
+
+## Eating-out expenditure
+
+```{r cafe2, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 2")
+```
+
+## Eating-out expenditure
+
+```{r cafe3, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 3")
+```
+
+## Eating-out expenditure
+
+```{r cafe4, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 4")
+```
+
+## Eating-out expenditure
+
+```{r cafe5, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 5")
+```
+
+## Eating-out expenditure
+
+```{r cafe6, dependson='cafe', fig.height=5, echo=FALSE}
+cafe_plot("K = 6")
+```
+
+## Example: weekly gasoline products
+\fontsize{8}{8}\sf
+```{r, echo = FALSE}
+options(width = 70)
+```
+
+```{r gasmodel, echo=TRUE}
+gasoline <- as_tsibble(fpp2::gasoline)
+fit <- gasoline %>% model(ARIMA(value ~ fourier(K = 13) + PDQ(0, 0, 0)))
+report(fit)
+```
+
+## Example: weekly gasoline products
+\fontsize{11}{12}\sf
+
+```{r gasf, echo=TRUE, fig.height=3.5}
+forecast(fit, h = "3 years") %>%
+  autoplot(gasoline)
+```
+
+# Lab Session 19
+## Lab Session 19
+
+Repeat Lab Session 18 but using all available data, and handling the annual seasonality using Fourier terms.
+
+# Lagged predictors
+
+## Lagged predictors
+
+Sometimes a change in $x_t$ does not affect $y_t$ instantaneously
+
+\begin{block}{}
+\begin{itemize}
+  \item $y_t=$ sales, $x_t=$ advertising.
+  \item $y_t=$ stream flow, $x_t=$ rainfall.
+  \item $y_t=$ size of herd, $x_t=$ breeding stock.
+\end{itemize}
+\end{block}
+\pause
+
+  * These are dynamic systems with input ($x_t$) and output $(y_t)$.
+  * $x_t$ is often a leading indicator.
+  * There can be multiple predictors.
+
+## Lagged predictors
+
+The model include present and past values of predictor: $x_t,x_{t-1},x_{t-2},\dots.$
+\begin{block}{}
+\centerline{$
+y_t = a + \nu_0x_t + \nu_1x_{t-1} + \dots + \nu_kx_{t-k} + \eta_t$}
+\end{block}
+where $\eta_t$ is an ARIMA process.\pause
+
+  * $x$ can influence $y$, but $y$ is not allowed to influence $x$.
+
+## Example: Insurance quotes and TV adverts
+
+```{r tvadvertdata}
+insurance <- as_tsibble(fpp2::insurance, pivot_longer = FALSE) %>%
+  rename(Month = index)
+```
+
+```{r tvadvertdata2}
+insurance
+```
+
+## Example: Insurance quotes and TV adverts
+
+```{r tvadvert, dependson='tvadvertdata'}
+insurance %>%
+  pivot_longer(c(Quotes, TV.advert)) %>%
+  ggplot(aes(x = Month, y = value)) + geom_line() +
+  facet_grid(vars(name), scales = "free_y") +
+  labs(x = "Year", y = NULL, title = "Insurance advertising and quotations")
+```
+
+## Example: Insurance quotes and TV adverts
+
+```{r tvadvertpairs, dependson='tvadvertdata'}
+insurance %>%
+  mutate(
+    lag1 = lag(TV.advert),
+    lag2 = lag(lag1)
+  ) %>%
+  as_tibble() %>%
+  select(-Month) %>%
+  rename(lag0 = TV.advert) %>%
+  pivot_longer(-Quotes, names_to="Lag", values_to="TV_advert") %>%
+  ggplot(aes(x = TV_advert, y = Quotes)) + geom_point() +
+  facet_grid(. ~ Lag) +
+  labs(title = "Insurance advertising and quotations")
+```
+
+## Example: Insurance quotes and TV adverts
+\fontsize{10}{10}\sf
+
+```{r, echo=TRUE}
+fit <- insurance %>%
+  # Restrict data so models use same fitting period
+  mutate(Quotes = c(NA, NA, NA, Quotes[4:40])) %>%
+  model(
+    ARIMA(Quotes ~ pdq(d = 0) + TV.advert),
+    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
+                                lag(TV.advert)),
+    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
+                                lag(TV.advert) +
+                                lag(TV.advert, 2)),
+    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
+                                lag(TV.advert) +
+                                lag(TV.advert, 2) +
+                                lag(TV.advert, 3))
+  )
+```
+
+## Example: Insurance quotes and TV adverts
+\fontsize{10}{10}\sf
+
+```{r, echo=TRUE, results = 'hide'}
+glance(fit)
+```
+```{r, echo = FALSE}
+glance(fit) %>%
+  transmute(`Lag order` = 0:3, sigma2, log_lik, AIC, AICc, BIC) %>%
+  knitr::kable()
+```
+
+## Example: Insurance quotes and TV adverts
+
+\fontsize{8}{9}\sf
+
+```{r tvadvertagain, echo=TRUE}
+# Re-fit to all data
+fit <- insurance %>%
+  model(ARIMA(Quotes ~ TV.advert + lag(TV.advert) + pdq(d = 0)))
+report(fit)
+```
+
+\pause
+\vspace{-1em}
+
+```{r tvadvertparam, echo=FALSE, dependson='tvadvertagain'}
+# Store coefficients
+coef <- rlang::set_names(tidy(fit)$estimate, tidy(fit)$term)
+phi1 <- coef["ar1"]
+theta1 <- coef["ma1"]
+theta2 <- coef["ma2"]
+intercept <- coef["intercept"]
+gamma0 <- coef["TV.advert"]
+gamma1 <- coef["lag(TV.advert)"]
+```
+
+###
+\begin{align*}
+  y_t &= `r format(intercept, digits=3)` +
+         `r format(gamma0, digits=3)` x_t +
+         `r format(gamma1, digits=2)` x_{t-1} + \eta_t,\\
+  \eta_t &= `r format(phi1, digits=3)` \eta_{t-1} +
+        \varepsilon_t +
+        `r format(theta1, digits=2)` \varepsilon_{t-1} +
+        `r format(theta2, digits=2)` \varepsilon_{t-2}.
+\end{align*}
+
+## Example: Insurance quotes and TV adverts
+\fontsize{11}{13}\sf
+
+```{r, echo=TRUE, fig.height=3.3}
+advert_a <- new_data(insurance, 20) %>%
+  mutate(TV.advert = 10)
+forecast(fit, advert_a) %>% autoplot(insurance)
+```
+
+## Example: Insurance quotes and TV adverts
+\fontsize{11}{13}\sf
+
+```{r, echo=TRUE, fig.height=3.3}
+advert_b <- new_data(insurance, 20) %>%
+  mutate(TV.advert = 8)
+forecast(fit, advert_b) %>% autoplot(insurance)
+```
+
+## Example: Insurance quotes and TV adverts
+\fontsize{11}{13}\sf
+
+```{r, echo=TRUE, fig.height=3.3}
+advert_c <- new_data(insurance, 20) %>%
+  mutate(TV.advert = 6)
+forecast(fit, advert_c) %>% autoplot(insurance)
+```
