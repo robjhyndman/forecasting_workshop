@@ -6,10 +6,12 @@ TARGETS=$(SOURCES:%.Rmd=%.pdf)
 	@echo "$< -> $@"
 	@Rscript -e "rmarkdown::render('$<')"
 
-default: $(TARGETS)
+default: $(TARGETS) README.md
+
+README.md: README.qmd
+	quarto render README.qmd
 
 clean:
 	rm -rf $(TARGETS)
 	rm -rf *_cache
 	rm -rf *_files
-
