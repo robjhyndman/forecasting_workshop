@@ -11,3 +11,4 @@
 *.out
 *.snm
 *.vrb
+.DS_Store
