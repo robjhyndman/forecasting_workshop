@@ -18,7 +18,9 @@ output:
 ```{r setup, include=FALSE}
 source("setup.R")
 library(purrr)
-elecequip <- as_tsibble(fpp2::elecequip)
+library(transformr) # Just to get it on renv
+library(gganimate)
+library(latex2exp)
 tourism <- tourism %>%
   mutate(
     State = recode(State,
@@ -68,43 +70,167 @@ where & $y_t=$ & data at period $t$ \\
   *  Take logs to get multiplicative decomposition.
   *  Use Box-Cox transformations to get other decompositions.
 
-## Decomposition dable
+## US Retail Employment
+\fontsize{11}{11}\sf
 
-\fontsize{10}{11}\sf
+```{r usretail}
+us_retail_employment <- us_employment %>%
+  filter(year(Month) >= 1990, Title == "Retail Trade") %>%
+  select(-Series_ID)
+us_retail_employment
+```
 
-```{r dable}
-dcmp <- elecequip %>%
-  model(STL(value ~ season(window = 7))) %>%
-  components()
+\vspace*{10cm}
+
+## US Retail Employment
+
+```{r dable1}
+us_retail_employment %>%
+  autoplot(Employed) +
+  labs(y="Persons (thousands)", title="Total employment in US retail")
+```
+
+\vspace*{10cm}
+
+## US Retail Employment
+\fontsize{11}{11}\sf
+
+```{r dable2}
+dcmp <- us_retail_employment %>%
+  model(stl = STL(Employed))
 dcmp
 ```
 
-## Euro electrical equipment
+\vspace*{10cm}
 
-\fontsize{11}{14}\sf
+## US Retail Employment
+\fontsize{11}{11}\sf
 
-```{r elecequip-stl, fig.width=8, fig.height=5}
-autoplot(dcmp) + xlab("Year")
+```{r dable3}
+components(dcmp)
 ```
 
-## Euro electrical equipment
+\vspace*{10cm}
 
-```{r elecequip3}
-dcmp %>% gg_subseries(season_year)
+## US Retail Employment
+
+```{r usretail-stl, fig.width=8, fig.height=5}
+components(dcmp) %>% autoplot()
 ```
 
-## Euro electrical equipment
+## US Retail Employment
 
-\fontsize{10}{13}\sf
-
-```{r elecequip-trend, message=FALSE, warning=FALSE}
-elecequip %>%
-  autoplot(value) +
-  autolayer(dcmp, trend, col='blue')
+```{r dable4, fig.height=2.7}
+us_retail_employment %>%
+  autoplot(Employed, color='gray') +
+  autolayer(components(dcmp), trend, color='#D55E00') +
+  labs(y="Persons (thousands)", title="Total employment in US retail")
 ```
+
+\vspace*{10cm}
+
+
+## US Retail Employment
+
+```{r usretail3}
+components(dcmp) %>% gg_subseries(season_year)
+```
+
+## Seasonal adjustment
+
+  *  Useful by-product of decomposition:  an easy way to calculate seasonally adjusted data.
+  *  Additive decomposition: seasonally adjusted data given by
+$$y_t - S_t = T_t + R_t$$
+  *  Multiplicative decomposition: seasonally adjusted data given by
+$$y_t / S_t = T_t \times R_t$$
+
+## US Retail Employment
+
+```{r usretail-sa, fig.height=2.7}
+us_retail_employment %>%
+  autoplot(Employed, color='gray') +
+  autolayer(components(dcmp), season_adjust, color='#0072B2') +
+  labs(y="Persons (thousands)", title="Total employment in US retail")
+```
+
+## Seasonal adjustment
+
+  * We use estimates of $S$ based on past values to seasonally adjust a current value.
+  *  Seasonally adjusted series reflect **remainders** as well as **trend**. Therefore they are not "smooth" and "downturns" or "upturns" can be misleading.
+  *  It is better to use the trend-cycle component to look for turning points.
+
+## STL decomposition
+
+```{r stlwindowanim, echo=FALSE, warning=FALSE, message=FALSE, fig.show='animate', interval=1/10,  fig.height=5.35, fig.width=8, aniopts='controls,buttonsize=0.3cm,width=11.5cm', eval=TRUE}
+s_windows <- seq(5,55,by=2)
+stl_defs <- purrr::map(s_windows, function(s_window){
+  STL(Employed ~ season(window=s_window), robust=TRUE)
+})
+names(stl_defs) <- sprintf("season(window=%02d)", s_windows)
+
+us_retail_employment %>%
+  model(!!!stl_defs) %>%
+  components() %>%
+  as_tibble() %>%
+  pivot_longer(Employed:remainder,
+               names_to = "component", names_ptypes = list(component = factor(levels = c("Employed", "trend", "season_year", "remainder"))),
+               values_to = "Employed") %>%
+  ggplot(aes(x = Month, y = Employed)) +
+  geom_line() +
+  facet_grid(rows = vars(component), scales = "free_y") +
+  labs(title = "STL decomposition of US retail employment",
+       subtitle = "{closest_state}") +
+  transition_states(.model)
+```
+
+\vspace*{10cm}
+
+## STL decomposition
+
+```{r echo = TRUE, results = 'hide'}
+us_retail_employment %>%
+  model(STL(Employed ~ trend(window=15) + season(window="periodic"),
+            robust = TRUE)) %>% 
+  components()
+```
+
+\fontsize{12}{13}\sf
+
+  *  `trend(window = ?)` controls wiggliness of trend component.
+  *  `season(window = ?)` controls variation on seasonal component.
+  *  `season(window = 'periodic')` is equivalent to an infinite window.
+
+## STL decomposition
+
+```{r mstl, fig.width=8.5, fig.height=3.4}
+us_retail_employment %>%
+  model(STL(Employed)) %>%
+  components() %>% autoplot()
+```
+
+\only<2>{\begin{textblock}{7}(8,0.2)\fontsize{11}{11}\sf
+\begin{alertblock}{}
+\begin{itemize}\tightlist
+\item \texttt{STL()} chooses \texttt{season(window=13)} by default
+\item Can include transformations.
+\end{itemize}
+\end{alertblock}
+\end{textblock}}
+
+## STL decomposition
+\fontsize{13}{14.5}\sf
+
+* Algorithm that updates trend and seasonal components iteratively.
+* Starts with $\hat{T}_t=0$
+* Uses a mixture of loess and moving averages to successively refine the trend and seasonal estimates.
+* The trend window controls loess bandwidth applied to deasonalised values.
+* The season window controls loess bandwidth applied to detrended subseries.
+* Robustness weights based on remainder.
+* Default season `window = 13`
+* Default trend `window = nextodd(` \newline\mbox{}\hfill `ceiling((1.5*period)/(1-(1.5/s.window)))`
+
 
 ## Australian holidays
-\fontsize{9}{10}\sf
 
 ```{r holidays, include=FALSE}
 holidays <- tourism %>%
@@ -119,24 +245,40 @@ holidays %>% autoplot(Trips) +
   ggtitle("Australian domestic holiday nights")
 ```
 
-## Holidays decomposition
-\fontsize{8}{9}\sf
+## Decomposition plot
 
 ```{r stlagain2, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
+holidays %>%
+  model(stl = STL(Trips ~ season(window = 7))) %>%
+  components() %>%
+  autoplot()
+```
+
+## Decomposition plot
+
+```{r stlagain3, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
 holidays %>%
   model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) %>%
   components() %>%
   autoplot()
 ```
 
-## Holidays decomposition
-\fontsize{8}{9}\sf
 
-```{r stlagain, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
-holidays %>%
-  model(stl = STL(Trips ~ season(window = 5), robust = TRUE)) %>%
-  components() %>%
-  autoplot()
+## Decomposition subseries
+
+```{r elecequip3}
+dcmp <- holidays %>% model(stl = STL(Trips)) %>%
+  components()
+dcmp %>% gg_subseries(season_year)
+```
+
+## Decomposition trend
+
+\fontsize{10}{13}\sf
+
+```{r elecequip-trend, message=FALSE, warning=FALSE}
+autoplot(dcmp) +
+  autolayer(holidays, Trips, alpha=0.4)
 ```
 
 ## STL decomposition
@@ -203,6 +345,8 @@ autoplot(dcmp, trend, scale_bars = FALSE) +
 
 4. Can you produce a plausible seasonally adjusted series? [Hint: `season_adjust` is one of the variables returned by `STL`.]
 
+# Multiple seasonality
+
 ## Multiple seasonality
 \fontsize{9}{9}\sf
 
@@ -218,7 +362,7 @@ png("figs/vic_elec_stl.png", width = 18, height=18, res=300, units="cm", type = 
 vic_elec %>%
   model(STL(Demand)) %>%
   components() %>%
-  autoplot() 
+  autoplot()
 crop::dev.off.crop()
 ```
 
@@ -227,71 +371,7 @@ crop::dev.off.crop()
 \vspace*{10cm}
 
 
-# Seasonal adjustment
-
-## Seasonal adjustment
-
-  *  Useful by-product of decomposition:  an easy way to calculate seasonally adjusted data.
-  *  Additive decomposition: seasonally adjusted data given by
-$$y_t - S_t = T_t + R_t$$
-  *  Multiplicative decomposition: seasonally adjusted data given by
-$$y_t / S_t = T_t \times R_t$$
-
-## US Retail Employment
-\fontsize{11}{11}\sf
-
-```{r usretail}
-us_retail_employment <- us_employment %>%
-  filter(year(Month) >= 1990, Title == "Retail Trade") %>%
-  select(-Series_ID)
-us_retail_employment
-```
-
-\vspace*{10cm}
-
-## US Retail Employment
-
-```{r dable1}
-us_retail_employment %>%
-  autoplot(Employed) +
-  labs(y="Persons (thousands)", title="Total employment in US retail")
-```
-
-\vspace*{10cm}
-
-
-## US Retail Employment
-\fontsize{11}{11}\sf
-
-```{r dable3}
-dcmp <- us_retail_employment %>%
-  model(stl = STL(Employed))
-components(dcmp)
-```
-
-\vspace*{10cm}
-
-## US Retail Employment
-
-```{r usretail-stl, fig.width=8, fig.height=5}
-components(dcmp) %>% autoplot()
-```
-
-## US Retail Employment
-
-```{r usretail-sa, fig.height=2.8}
-us_retail_employment %>%
-  autoplot(Employed, color='gray') +
-  autolayer(components(dcmp), season_adjust, color='#0072B2') +
-  labs(y="Persons (thousands)", title="Total employment in US retail")
-```
-
-
-## Seasonal adjustment
-
-  * We use estimates of $S$ based on past values to seasonally adjust a current value.
-  *  Seasonally adjusted  series reflect **remainders** as well as **trend**. Therefore they are not "smooth"" and "downturns"" or "upturns" can be misleading.
-  *  It is better to use the trend-cycle component to look for turning points.
+# The ABS stuff-up
 
 ## The ABS stuff-up
 
