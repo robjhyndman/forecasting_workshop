@@ -15,13 +15,8 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE,
-  dev.args = list(pointsize = 11)
-)
-options(digits = 3, width = 66)
-library(tidyverse)
-library(fpp3)
+source("setup.R")
+
 usmelec <- as_tsibble(fpp2::usmelec) %>%
   rename(Month = index, Generation = value)
 us_change <- readr::read_csv("https://otexts.com/fpp3/extrafiles/us_change.csv") %>%

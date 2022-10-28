@@ -15,12 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE,
-  dev.args = list(pointsize = 11)
-)
-options(digits = 3, width = 60)
-library(fpp3)
+source("setup.R")
 global_economy <- global_economy %>%
   select(Year, Country, GDP, Imports, Exports, Population)
 tourism <- tourism %>%
@@ -44,10 +39,10 @@ tourism <- tourism %>%
 
 \begin{textblock}{3.8}(8,0)\begin{alertblock}{}\Large\textbf{tidyverts.org}\end{alertblock}\end{textblock}
 
-\placefig{1}{1.4}{width=4cm}{tsibble.png}
-\placefig{5}{1.4}{width=4cm}{tsibbledata.png}
-\placefig{3}{4.85}{width=4cm}{feasts.png}
-\placefig{7}{4.85}{width=4cm}{fable.png}
+\placefig{1}{1.4}{width=3.5cm}{tsibble.png}
+\placefig{5}{1.4}{width=3.5cm}{tsibbledata.png}
+\placefig{3}{4.85}{width=3.5cm}{feasts.png}
+\placefig{7}{4.85}{width=3.5cm}{fable.png}
 
 ## Tidyverts developers
 
@@ -106,13 +101,13 @@ library(fpp3)
 global_economy
 ```
 
-\only<2->{\begin{textblock}{.75}(2.15,3.7)
+\only<2->{\begin{textblock}{.75}(2.15,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Index\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<3->{\begin{textblock}{1.6}(3.28,3.7)
+\only<3->{\begin{textblock}{1.6}(3.28,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Key\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<4>{\begin{textblock}{6.7}(5.5,3.7)
+\only<4>{\begin{textblock}{6.7}(5.5,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Measured variables\phantom{dg}\end{alertblock}
 \end{textblock}}
 
@@ -124,13 +119,13 @@ global_economy
 tourism
 ```
 
-\only<2->{\begin{textblock}{1.1}(2.1,3.7)
+\only<2->{\begin{textblock}{1.1}(2.1,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Index\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<3->{\begin{textblock}{3.9}(3.65,3.7)
+\only<3->{\begin{textblock}{3.9}(3.65,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Keys\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<4-5>{\begin{textblock}{1.5}(7.95,3.7)
+\only<4-5>{\begin{textblock}{1.5}(7.95,3.65)
 \begin{alertblock}{}\fontsize{10}{10}\sf Measure\phantom{dg}\end{alertblock}
 \end{textblock}}
 
@@ -386,7 +381,7 @@ PBS %>%
   mutate(total_cost = total_cost / 1e6) -> a10
 ```
 
-```{r a10, echo=FALSE}
+```{r a10, echo=FALSE, dependson="pbs6"}
 a10
 ```
 
@@ -405,10 +400,10 @@ options(width = 60)
  4. Create a new tsibble which combines the Purposes and Regions, and just has total trips by State.
 
 # Time plots
-## Are line plots best?
-\fontsize{11}{12}\sf
+## Time plots
+\fontsize{10}{11}\sf
 
-```{r maxtemp, fig.height=3}
+```{r maxtemp, fig.height=2.4}
 maxtemp <- vic_elec %>%
   index_by(Day = date(Time)) %>%
   summarise(Temperature = max(Temperature))
@@ -417,33 +412,6 @@ maxtemp %>%
   xlab("Week") + ylab("Max temperature")
 ```
 
-## Are line plots best?
-\fontsize{11}{12}\sf
-
-```{r maxtemp2, warning=FALSE, message=FALSE, dependson="maxtemp"}
-maxtemp %>%
-  ggplot(aes(x = Day, y = Temperature)) +
-  geom_point() +
-  xlab("Week") + ylab("Max temperature")
-```
-
-## Are line plots best?
-\fontsize{11}{12}\sf
-
-```{r maxtemp3, warning=FALSE, message=FALSE, dependson="maxtemp", fig.height=2.5}
-maxtemp %>%
-  ggplot(aes(x = Day, y = 1)) +
-  geom_tile(aes(fill = Temperature)) +
-  scale_fill_gradient2(
-    low = "navy", mid = "yellow",
-    high = "red", midpoint = 28
-  ) +
-  ylab("") + scale_y_discrete(expand = c(0, 0))
-```
-
-## Are line plots best?
-
-\full{TemperatureBlanket}
 
 ## Ansett airlines
 
@@ -452,7 +420,7 @@ maxtemp %>%
 ## Ansett airlines
 \fontsize{11}{12}\sf
 
-```{r, echo=TRUE, fig.height=3.8}
+```{r, echo=TRUE, fig.height=3.1}
 ansett %>%
   autoplot(Passengers)
 ```
@@ -460,7 +428,7 @@ ansett %>%
 ## Ansett airlines
 \fontsize{11}{12}\sf
 
-```{r, echo=TRUE, fig.height=3.8}
+```{r, echo=TRUE, fig.height=3.1}
 ansett %>%
   filter(Class == "Economy") %>%
   autoplot(Passengers)
@@ -469,7 +437,7 @@ ansett %>%
 ## Ansett airlines
 \fontsize{11}{12}\sf
 
-```{r, echo=TRUE, fig.height=3.8}
+```{r, echo=TRUE, fig.height=3.1}
 ansett %>%
   filter(Airports == "MEL-SYD") %>%
   autoplot(Passengers)
@@ -478,13 +446,13 @@ ansett %>%
 ## Ansett airlines
 \fontsize{11}{12}\sf
 
-```{r, echo=TRUE, fig.height=3.8}
+```{r, echo=TRUE, fig.height=3.1}
 ansett %>%
   filter(Airports == "MEL-SYD") %>%
   autoplot(Passengers)
 ```
 
-\begin{textblock}{2.2}(10,7.3)
+\begin{textblock}{2.2}(10,9.3)
 \begin{alertblock}{}
 Not the real data! Or is it?
 \end{alertblock}

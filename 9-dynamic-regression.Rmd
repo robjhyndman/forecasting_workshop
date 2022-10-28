@@ -17,11 +17,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = FALSE, cache = TRUE, warning = FALSE, message = FALSE,
-  dev.args = list(bg = grey(0.9), pointsize = 11)
-)
-library(fpp3)
+source("setup.R")
 
 vic_elec_daily <- vic_elec %>%
   filter(year(Time) == 2014) %>%

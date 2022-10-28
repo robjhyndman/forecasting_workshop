@@ -17,14 +17,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE,
-  cache = TRUE,
-  warning = FALSE,
-  message = FALSE
-)
-library(fpp3)
-options(digits = 4, width = 55)
+source("setup.R")
 ```
 
 ## Instructors

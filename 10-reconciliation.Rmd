@@ -15,12 +15,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE,
-  dev.args = list(pointsize = 11)
-)
-options(digits = 3, width = 60)
-library(fpp3)
+source("setup.R")
 ```
 
 # Hierarchical and grouped time series
