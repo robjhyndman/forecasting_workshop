@@ -29,7 +29,7 @@ austa <- as_tsibble(fpp2::austa) %>%
   rename(Year = index, Visitors = value)
 ```
 
-# What can we forecast?
+# Statistical forecasting
 
 ## Forecasting is difficult
 
@@ -89,41 +89,201 @@ Something is easier to forecast if:
  - there is relatively low natural/unexplainable random variation.
  - the future is somewhat similar to the past
 
-# The statistical forecasting perspective
+## Random futures
 
-## Sample futures
-
-```{r austa1, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=9, fig.height=6}
-fit <- austa %>% model(ETS())
-```
-
-```{r austa1a, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=9, fig.height=6}
+```{r austa, echo=FALSE}
+# Grab ABS data
+austa <- readxl::read_excel("data/340101.xlsx", sheet="Data1", skip=9) %>%
+  rename(date = `Series ID`, value = A85375847A) %>%
+  select(date, value) %>%
+  transmute(
+    Month = yearmonth(date),
+    Visitors = value / 1e3
+  ) %>%
+  bind_rows(tibble(
+    Month = yearmonth(seq(as.Date("2021-11-01"), by = "1 month", length = 2)),
+    Visitors = NA_real_
+  )) %>%
+  as_tsibble(index = Month) %>%
+  filter(Month >= yearmonth("2000 Jan"))
+# Fit ETS model
+fit <- austa %>%
+  filter(Month < yearmonth("2018 Jan")) %>%
+  model(ETS(Visitors))
+# Product forecasts
+fc <- forecast(fit, h = 48) %>%
+  mutate(Month = as.Date(Month))
+# Simulate 100 future sample paths
+set.seed(1967)
 sim <- fit %>%
-  generate(h = 10, times = 10) %>%
+  generate(h = 48, times = 100) %>%
   mutate(
-    replicate = factor(.rep, levels = 1:10, labels = paste("Future", 1:10))
+    replicate = factor(.rep, levels = 1:100, labels = paste("Future", 1:100)),
+    .rep = as.numeric(.rep)
+  ) %>%
+  as_tibble() %>%
+  mutate(Month = as.Date(Month))
+# Nice colors
+cols <- scale_colour_manual(
+  values = c("#D55E00", "#0072B2", "#009E73", "#CC79A7", "#E69F00", "#56B4E9", "#F0E442", sample(rainbow(93))),
+  breaks = paste("Future", 1:100),
+  name = " "
+)
+# Now build up some plots with alignment
+p1 <- austa %>%
+  mutate(Visitors = if_else(Month >= yearmonth("2018 Jan"), NA_real_, Visitors)) %>%
+  as_tibble() %>%
+  mutate(Month = as.Date(Month)) %>%
+  ggplot(aes(x = Month, y = Visitors)) +
+  geom_line() +
+  labs(
+    x = "Month",
+    y = "Thousands of visitors",
+    title = "Total short-term visitors to Australia"
+  ) +
+  scale_x_date(
+    breaks = seq(as.Date("2000-01-01"), by = "5 years", l = 5),
+    labels = paste("Jan", seq(2000, 2020, by = 5)),
+    minor_breaks = seq(as.Date("2001-01-01"), by = "1 year", l = 25)
+  ) +
+  ylim(min(austa$Visitors, sim$.sim, na.rm = TRUE), max(austa$Visitors, sim$.sim, na.rm = TRUE))
+p2 <- p1 + cols +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate),
+    data = sim %>% filter(.rep <= 1)
   )
-ggplot(austa, aes(x = Year)) +
-  geom_line(aes(y = Visitors, colour = "Data")) +
-  geom_line(aes(y = .sim, colour = replicate), data = sim) +
-  ylab("Millions of visitors") + xlab("Year") +
-  ggtitle("Total international visitors to Australia") +
-  scale_colour_manual(
-    values = c("#000000", rainbow(10)),
-    breaks = c("Data", paste("Future", 1:10)),
-    name = " "
+p3 <- p1 + cols +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate),
+    data = sim %>% filter(.rep <= 2)
+  )
+p4 <- p1 + cols +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate),
+    data = sim %>% filter(.rep <= 3)
+  )
+p5 <- p1 + cols +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate),
+    data = sim %>% filter(.rep <= 10)
+  )
+p6 <- p1 + cols +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate), alpha = 0.5, data = sim) +
+  guides(colour = "none")
+p7 <- p1 +
+  geom_line(aes(y = .sim, group = replicate, colour = replicate), alpha = 0.5, col = "gray", data = sim) +
+  guides(colour = "none")
+p8 <- p7 + autolayer(fc, level = c(50, 90))
+p9 <- p8 + coord_cartesian(xlim=as.Date(c("2014-01-01","2021-08-01"))) +
+  scale_x_date(
+    breaks = seq(as.Date("2000-01-01"), by = "2 years", l = 11),
+    labels = paste("Jan", seq(2000, 2020, by = 2)),
+    minor_breaks = seq(as.Date("2001-01-01"), by = "1 year", l = 25)
+  )
+aligned_plots <- align_patches(p1, p2, p3, p4, p5, p6, p7, p8,p9)
+```
+
+\forecast\pause
+
+```{r austa1, dependson="austa", echo=FALSE}
+aligned_plots[[1]]
+```
+
+## Random futures
+
+\forecast
+
+```{r austa2, dependson='austa', echo=FALSE}
+aligned_plots[[2]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa3, dependson='austa', echo=FALSE}
+aligned_plots[[3]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa4, dependson='austa', echo=FALSE}
+aligned_plots[[4]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa5, dependson='austa', echo=FALSE}
+aligned_plots[[5]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa6, dependson='austa', echo=FALSE}
+aligned_plots[[6]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa7, dependson='austa', echo=FALSE}
+aligned_plots[[7]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa8, dependson='austa', echo=FALSE}
+aligned_plots[[8]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa9, dependson='austa', echo=FALSE}
+aligned_plots[[9]]
+```
+
+\simfutures
+
+## Random futures
+
+\forecast
+
+```{r austa9b, dependson='austa', echo=FALSE}
+aligned_plots[[9]] +
+  geom_line(
+    colour = "black",
+    data = austa %>% filter(Month >= yearmonth("2018 Jan")) %>% mutate(Month = as.Date(Month))
   )
 ```
 
-## Forecast intervals
+\simfutures
 
-```{r austa2, echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=8.6, fig.height=6}
-fit %>%
-  forecast(h = 10) %>%
-  autoplot(austa) +
-  ylab("Millions of visitors") + xlab("Year") +
-  ggtitle("Forecasts of total international visitors to Australia")
-```
+\only<2>{\begin{textblock}{8.5}(.3,6.5)\begin{alertblock}{}
+``He who sees the past as surprise-free is bound to have a future full of surprises.''\\\mbox{}\hfill{\small (Amos Tversky)}
+\end{alertblock}\end{textblock}
+}
+
 
 ## Statistical forecasting
 
@@ -197,7 +357,7 @@ gafa_stock %>%
   * Forecast of all future values is equal to mean of historical data $\{y_1,\dots,y_T\}$.
   * Forecasts: $\hat{y}_{T+h|T} = \bar{y} = (y_1+\dots+y_T)/T$
 
-```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 3.3}
+```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 2.7}
 bricks <- aus_production %>%
   filter(!is.na(Bricks)) %>%
   mutate(average = mean(Bricks))
@@ -223,7 +383,7 @@ bricks %>%
   * Forecasts: $\hat{y}_{T+h|T} =y_T$.
   * Consequence of efficient market hypothesis.
 
-```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 3.3}
+```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
 bricks %>%
   filter(!is.na(Bricks)) %>%
   model(NAIVE(Bricks)) %>%
@@ -241,7 +401,7 @@ bricks %>%
   * Forecasts equal to last value from same season.
   * Forecasts: $\hat{y}_{T+h|T} =y_{T+h-m(k+1)}$, where $m=$ seasonal period and $k$ is the integer part of $(h-1)/m$.
 
-```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 3.3}
+```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
 bricks %>%
   model(SNAIVE(Bricks ~ lag("year"))) %>%
   forecast(h = "5 years") %>%
@@ -329,7 +489,7 @@ A \texttt{fable} is a forecast table with point forecasts and distributions.
 
 \footnotesize
 
-```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=3, dependson='brick-fc'}
+```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=2.6, dependson='brick-fc'}
 brick_fc %>%
   autoplot(aus_production, level = NULL) +
   ggtitle("Forecasts for quarterly clay brick production") +
@@ -393,11 +553,9 @@ brick_fc %>% hilo(level=c(50,75)) %>% unpack_hilo(c("50%", "75%"))
 ## Facebook closing stock price
 \fontsize{9}{10}\sf
 
-```{r fbf, fig.height=3.5}
+```{r fbf}
 fb_stock <- gafa_stock %>%
-  filter(Symbol == "FB") %>%
-  mutate(trading_day = row_number()) %>%
-  update_tsibble(index = trading_day, regular = TRUE)
+  filter(Symbol == "FB")
 fb_stock %>% autoplot(Close)
 ```
 
@@ -412,7 +570,7 @@ augment(fit)
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4, echo=TRUE, warning=FALSE, fig.height=3.7}
+```{r dj4, echo=TRUE, warning=FALSE, fig.height=2.5}
 augment(fit) %>%
   ggplot(aes(x = trading_day)) +
   geom_line(aes(y = Close, colour = "Data")) +
@@ -422,7 +580,7 @@ augment(fit) %>%
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4a, echo=TRUE, warning=FALSE, fig.height=3.7}
+```{r dj4a, echo=TRUE, warning=FALSE, fig.height=2.5}
 augment(fit) %>%
   filter(trading_day > 1100) %>%
   ggplot(aes(x = trading_day)) +
@@ -442,7 +600,7 @@ augment(fit) %>%
 ## Facebook closing stock price
 \fontsize{11}{11}\sf
 
-```{r dj6, warning=FALSE}
+```{r dj6, warning=FALSE, fig.height=2.7}
 augment(fit) %>%
   ggplot(aes(x = .resid)) +
   geom_histogram(bins = 150) +
@@ -480,8 +638,8 @@ Test whether *whole set* of $r_{k}$ values is significantly different from zero 
 
 \begin{block}{}
 \centerline{$\displaystyle
- Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$}
-where $h=$ max lag and $T=$ \# observations.
+ Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$\qquad
+where $h=$ max lag and $T=$ \# observations.}
 \end{block}
 
   * If each $r_k$ close to zero, $Q$ will be **small**.
@@ -495,8 +653,8 @@ where $h=$ max lag and $T=$ \# observations.
 
 \begin{block}{}
 \centerline{$\displaystyle
- Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$}
-where $h=$ max lag and $T=$ \# observations.
+ Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$\qquad
+where $h=$ max lag and $T=$ \# observations.}
 \end{block}
 
 \fontsize{11}{11}\sf
@@ -511,8 +669,7 @@ augment(fit) %>%
 
 ```{r dj9, echo=TRUE}
 # lag=h and dof=K
-augment(fit) %>%
-  features(.resid, ljung_box, dof = 0, lag = 10)
+augment(fit) %>% features(.resid, ljung_box, dof = 0, lag = 10)
 ```
 
 # Lab Session 12
@@ -598,7 +755,7 @@ $e_{T+h} =$  & $y_{T+h} - \pred{y}{T+h}{T}$
 \text{MSE} &= \text{mean}(e_{T+h}^2) \qquad
 &&\text{RMSE} &= \sqrt{\text{mean}(e_{T+h}^2)} \\[-0.1cm]
 \text{MAPE} &= 100\text{mean}(|e_{T+h}|/ |y_{T+h}|)
-\end{align*}\pause
+\end{align*}\pause\vspace*{-0.4cm}
 
   * MAE, MSE, RMSE are all scale dependent.
   * MAPE is scale independent but is only sensible if $y_t\gg 0$ for all $t$, and $y$ has a natural zero.
