@@ -16,10 +16,6 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-
-usmelec <- as_tsibble(fpp2::usmelec) %>%
-  rename(Month = index, Generation = value)
-eu_retail <- as_tsibble(fpp2::euretail)
 melsyd <- tsibbledata::ansett %>%
   filter(Airports == "MEL-SYD")
 austa <- as_tsibble(fpp2::austa) %>%

@@ -16,17 +16,11 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-
-usmelec <- as_tsibble(fpp2::usmelec) %>%
-  rename(Month = index, Generation = value)
-eu_retail <- as_tsibble(fpp2::euretail)
 h02 <- tsibbledata::PBS %>%
   filter(ATC2 == "H02") %>%
   summarise(Cost = sum(Cost))
 melsyd <- tsibbledata::ansett %>%
   filter(Airports == "MEL-SYD")
-austa <- as_tsibble(fpp2::austa) %>%
-  rename(Year = index, Visitors = value)
 ```
 
 # Statistical forecasting
