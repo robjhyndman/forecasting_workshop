@@ -3,14 +3,14 @@ title: "Time Series Analysis & Forecasting Using R"
 author: "3. Transformations"
 toc: true
 classoption: aspectratio=169
-titlepage: title16x9.png
+titlepage: Canberra16x9.jpg
 titlecolor: burntorange
 output:
   binb::monash:
     colortheme: monashwhite
     keep_tex: no
-    fig_width: 7
-    fig_height: 3.5
+    fig_width: 7.5
+    fig_height: 3
     includes:
       in_header: header.tex
 ---
