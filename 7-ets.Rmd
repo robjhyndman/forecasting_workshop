@@ -19,9 +19,6 @@ source("setup.R")
 
 usmelec <- as_tsibble(fpp2::usmelec) %>%
   rename(Month = index, Generation = value)
-us_change <- readr::read_csv("https://otexts.com/fpp3/extrafiles/us_change.csv") %>%
-  mutate(Time = yearquarter(Time)) %>%
-  as_tsibble(index = Time)
 eu_retail <- as_tsibble(fpp2::euretail)
 melsyd <- tsibbledata::ansett %>%
   filter(Airports == "MEL-SYD")
@@ -59,7 +56,7 @@ austa <- as_tsibble(fpp2::austa) %>%
 
  * Developed in the 1950s and 1960s as methods (algorithms) to produce point forecasts.
  * Combine a "level", "trend" (slope) and "seasonal" component to describe a time series.
- * The rate of change of the components are controlled by "smoothing parameters":\newline $\alpha$, $\beta$ and $\gamma$ respectively.
+ * The rate of change of the components are controlled by "smoothing parameters": $\alpha$, $\beta$ and $\gamma$ respectively.
   * Need to choose best values for the smoothing parameters (and initial states).
   * Equivalent ETS state space models developed in the 1990s and 2000s.
 
@@ -117,7 +114,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 
   * "innovations" or "single source of error" because equations have the same error process, $\varepsilon_t$.
   * Measurement equation: relationship between observations and states.
-  * Transition/state equation(s): evolution of the state(s) through time.
+  * Transition/state equation(s): evolution of state(s) over time.
 
 \vspace*{10cm}
 
@@ -140,6 +137,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 # Trend methods
 
 ## Holt's linear trend
+\fontsize{13}{15}\sf
 
 \begin{block}{Additive errors: ETS(A,A,N)}\vspace*{-0.4cm}
 \begin{align*}
@@ -192,7 +190,7 @@ components(fit) %>% autoplot()
 
 \fontsize{12}{12}\sf
 
-```{r holt-fc, echo=TRUE, cache=TRUE, dependson='holt-fit'}
+```{r holt-fc, echo=TRUE, cache=TRUE, dependson='holt-fit', fig.height=2.7}
 fit %>%
   forecast(h = 20) %>%
   autoplot(aus_economy) +
@@ -220,7 +218,7 @@ fit %>%
 ## Example: Australian population
 \fontsize{12}{12}\sf
 
-```{r, echo=TRUE, fig.height=3.6}
+```{r, echo=TRUE, fig.height=2.7}
 aus_economy %>%
   model(holt = ETS(Pop ~ trend("Ad"))) %>%
   forecast(h = 20) %>%
@@ -324,11 +322,10 @@ fit %>%
 
 \fontsize{9}{10}\sf
 
-```{r ausholidays-components-plot, fig.height=4.3}
+```{r ausholidays-components-plot}
 fit %>%
   filter(Region == "Snowy Mountains") %>%
-  components(fit) %>%
-  autoplot()
+  components(fit) %>% autoplot()
 ```
 
 ## Example: Australian holiday tourism
@@ -343,7 +340,7 @@ fit %>% forecast()
 
 \fontsize{9}{10}\sf
 
-```{r ausholidays-forecast-plot}
+```{r ausholidays-forecast-plot, fig.height=2.5}
 fit %>%
   forecast() %>%
   filter(Region == "Snowy Mountains") %>%
@@ -354,7 +351,7 @@ fit %>%
 # ETS taxonomy
 
 ## Exponential smoothing models
-\fontsize{11}{12}\sf
+\fontsize{11}{11}\sf
 
 \begin{block}{}
 \begin{tabular}{ll|ccc}
@@ -398,13 +395,14 @@ fit %>%
 \text{AIC} = -2\log(\text{L}) + 2k
 \]
 \end{block}\vspace*{-0.2cm}
-where $L$ is the likelihood and $k$ is the number of parameters initial states estimated in the model.\pause
+where $L$ is the likelihood and $k$ is the number of parameters & initial states estimated in the model.\pause
 
 \begin{block}{Corrected AIC}
 \[
-\text{AIC}_{\text{c}} = \text{AIC} + \frac{2(k+1)(k+2)}{T-k}
+\text{AIC}_{\text{c}} = \text{AIC} + \frac{2k(k+1)}{T-k-1}
 \]
-\end{block}
+\end{block}\vspace*{-0.4cm}
+
 which is the AIC corrected (for small sample bias).
 \pause
 \begin{block}{Bayesian Information Criterion}
@@ -448,7 +446,7 @@ Find an ETS model for the Gas data from `aus_production`.
 ## Non-Gaussian forecast distributions
 \fontsize{8.8}{9}\sf
 
-```{r cafe, fig.height=3.3}
+```{r cafe, fig.height=2.4}
 vic_cafe <- tsibbledata::aus_retail %>%
   filter(State == "Victoria",
          Industry == "Cafes, restaurants and catering services") %>%
@@ -482,7 +480,7 @@ if(!identical(fabletools:::model_sum(fit$ets[[1]]), "ETS(A,A,A)"))
 (fc <- fit %>% forecast(h = "3 years"))
 ```
 
-\only<2>{\begin{textblock}{5.5}(6.8,2.8)\fontsize{13}{14}\sf
+\only<2>{\begin{textblock}{5.5}(9.8,2.8)\fontsize{13}{14}\sf
 \begin{alertblock}{}
 \begin{itemize}
 \item \texttt{t(N)} denotes a transformed normal distribution.
@@ -509,7 +507,7 @@ sim
 ## Bootstrapped forecast distributions
 \fontsize{8.8}{9}\sf
 
-```{r, fig.height=3.4}
+```{r, fig.height=2.3}
 vic_cafe %>%
   filter(year(Month) >= 2008) %>%
   ggplot(aes(x = Month)) +
