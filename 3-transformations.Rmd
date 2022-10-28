@@ -73,7 +73,7 @@ print_retail %>%
 ## Inflation adjustments
 \fontsize{10}{10}\sf
 
-```{r, message=FALSE, warning=FALSE, echo=FALSE, fig.height=5}
+```{r, message=FALSE, warning=FALSE, echo=FALSE, fig.height=5, out.height="90%"}
 print_retail <- aus_retail %>%
   filter(Industry == "Newspaper and book retailing") %>%
   group_by(Industry) %>%
@@ -170,10 +170,11 @@ Each of these transformations is close to a member of the
 family of \textbf{Box-Cox transformations}:
 $$w_t = \left\{\begin{array}{ll}
         \log(y_t),      & \quad \lambda = 0; \\
-        (y_t^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
+        (sign(y_t)|y_t|^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
 \end{array}\right.
 $$\pause
 
+* Actually the Bickel-Doksum transformation (allowing for $y_t<0$)
 * $\lambda=1$: (No substantive transformation)
 * $\lambda=\frac12$: (Square root plus linear transformation)
 * $\lambda=0$: (Natural logarithm)
@@ -226,9 +227,8 @@ food %>% autoplot(box_cox(Turnover, 0.0524)) +
 * Often no transformation needed.
 * Simple transformations are easier to explain and work well enough.
 * Transformations can have very large effect on PI.
-* If the data contains zeros, then don't take logs.
-* `logp1()` can be useful for data with zeros.
-* If some data are negative, no power transformation is possible unless a constant is added to all values.
+* If some data are zero or negative, then use $\lambda>0$.
+* `log1p()` can also be useful for data with zeros.
 * Choosing logs is a simple way to force forecasts to be positive
 * Transformations must be reversed to obtain forecasts on the original scale. (Handled automatically by `fable`.)
 

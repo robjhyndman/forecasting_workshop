@@ -137,7 +137,6 @@ holidays %>%
 ```
 
 ## Calendar plots
-\fontsize{12}{10}\sf
 
 ```{r sugrrants, eval=FALSE}
 library(sugrrants)
@@ -161,7 +160,7 @@ prettify(p1,
 ## Calendar plots
 \fontsize{10}{11}\sf
 
-```{r sugrrants2, ref.label="sugrrants", echo=FALSE, fig.height=4.8, fig.width=7.5}
+```{r sugrrants2, ref.label="sugrrants", echo=FALSE, out.height="90%", fig.height=5.4, fig.width=9}
 
 ```
 
@@ -409,7 +408,7 @@ We have introduced the following functions: `gg_lag` and `ACF`. Use these functi
 
 ## Which is which?
 
-```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="11.5cm"}
+```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="15.5cm"}
 cowtemp <- as_tsibble(fma::cowtemp)
 USAccDeaths <- as_tsibble(USAccDeaths)
 AirPassengers <- as_tsibble(AirPassengers)
