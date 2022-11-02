@@ -7,6 +7,7 @@ titlepage: Canberra16x9.jpg
 titlecolor: burntorange
 output:
   binb::monash:
+    latex_engine: xelatex
     colortheme: monashwhite
     fig_width: 7.5
     fig_height: 3
@@ -557,9 +558,9 @@ fb_stock |> autoplot(Close)
 \fontsize{10}{10}\sf
 
 ```{r augment}
-fb_stock <- fb_stock |> 
+fb_stock <- fb_stock |>
   mutate(trading_day = row_number()) |>
-  update_tsibble(index = trading_day, regular = TRUE) 
+  update_tsibble(index = trading_day, regular = TRUE)
 fit <- fb_stock |> model(NAIVE(Close))
 augment(fit)
 ```

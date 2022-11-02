@@ -1,12 +1,12 @@
 % Packages
-%\usepackage{fontspec}
-%\setmonofont{FiraCode-Regular}[
-%BoldFont=FiraCode-Bold,
-%Contextuals=Alternate % Activate the calt feature
-%]
+\usepackage{fontspec,sourcesanspro}
+
+\setmonofont{Hack FC Ligatured-Regular}[
+Scale=0.8,Contextuals=Alternate % Activate the calt feature
+]
 \usepackage{bm,booktabs,tabularx}
 \usepackage{animate,soul}
-\DeclareUnicodeCharacter{03BC}{$\mu$}
+%\DeclareUnicodeCharacter{03BC}{$\mu$}
 \usepackage{fontawesome}
 
 % Figures
@@ -14,8 +14,8 @@
 
 % Fonts
 \fontsize{13}{15}\sf
-\usepackage[scale=0.85]{sourcecodepro}
-\DisableLigatures{encoding = T1, family = tt*}
+%\usepackage[scale=0.85]{sourcecodepro}
+%\DisableLigatures{encoding = T1, family = tt*}
 \setbeamerfont{title}{series=\bfseries,parent=structure,size=\fontsize{24}{24}}
 \ifcsname Shaded\endcsname
   \definecolor{shadecolor}{RGB}{225,225,225}
@@ -74,7 +74,7 @@
  A forecast is an estimate of the probabilities of possible futures.
 \end{alertblock}}
 
-\def\simfutures{\begin{textblock}{2.7}(13,7.7)
+\def\simfutures{\begin{textblock}{2.9}(12.8,7.7)
 \begin{block}{}\fontsize{10}{11}\sf
 Simulated futures from an ETS model
 \end{block}\end{textblock}}

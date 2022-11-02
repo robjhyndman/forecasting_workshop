@@ -8,6 +8,7 @@ titlecolor: burntorange
 output:
   binb::monash:
     colortheme: monashwhite
+    latex_engine: xelatex
     fig_width: 7.5
     fig_height: 3
     includes:
@@ -89,7 +90,7 @@ gafa_stock |>
 $$
   y_{t} = c + \phi_{1}y_{t - 1} + \phi_{2}y_{t - 2} + \cdots + \phi_{p}y_{t - p} + \varepsilon_{t},
 $$
-where $\varepsilon_t$ is white noise. This is a multiple regression with \textbf{lagged values} of $y_t$ as predictors.
+where $\varepsilon_t$ is white noise. A multiple regression with \textbf{lagged values} of $y_t$ as predictors.
 \end{block}
 
 ```{r arp, echo=FALSE, fig.height=2.3}
@@ -110,7 +111,7 @@ $$
   y_{t} = c + \varepsilon_t + \theta_{1}\varepsilon_{t - 1} + \theta_{2}\varepsilon_{t - 2} + \cdots + \theta_{q}\varepsilon_{t - q},
 $$
 where $\varepsilon_t$ is white noise.
-This is multiple regression with \textbf{lagged \emph{errors}} as predictors. \emph{Don't confuse with moving average smoothing!}
+A multiple regression with \textbf{lagged \emph{errors}} as predictors. \emph{Don't confuse with moving average smoothing!}
 \end{block}
 
 ```{r maq, fig.height=2.3, echo=FALSE}
@@ -326,6 +327,7 @@ usmelec |>
 ```
 
 ## Seasonal ARIMA models
+\fontsize{13}{15}\sf
 
 | ARIMA | $~\underbrace{(p, d, q)}$ | $\underbrace{(P, D, Q)_{m}}$ |
 | ----: | :-----------------------: | :--------------------------: |

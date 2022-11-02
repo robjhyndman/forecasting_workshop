@@ -7,8 +7,8 @@ titlepage: Canberra16x9.jpg
 titlecolor: burntorange
 output:
   binb::monash:
+    latex_engine: xelatex
     colortheme: monashwhite
-    keep_tex: no
     fig_width: 7.5
     fig_height: 3
     includes:
@@ -111,7 +111,7 @@ variation}
 \begin{tabular}{llc}
 Square root & $w_t = \sqrt{y_t}$ & $\downarrow$ \\[0.2cm]
 Cube root & $w_t = \sqrt[3]{y_t}$ & Increasing \\[0.2cm]
-Logarithm & $w_t = \log(y_t)$  & strength
+Logarithm & $w_t = \text{log}(y_t)$  & strength
 \end{tabular}
 \end{block}
 \pause
@@ -169,12 +169,12 @@ food |> autoplot(-1 / Turnover) +
 Each of these transformations is close to a member of the
 family of \textbf{Box-Cox transformations}:
 $$w_t = \left\{\begin{array}{ll}
-        \log(y_t),      & \quad \lambda = 0; \\
-        (sign(y_t)|y_t|^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
+        \text{log}(y_t),      & \quad \lambda = 0; \\
+        (\text{sign}(y_t)|y_t|^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
 \end{array}\right.
 $$\pause
 
-* Actually the Bickel-Doksum transformation (allowing for $y_t<0$)
+* Actually the Bickel-Doksum transformation (allowing for \rlap{$y_t<0$)}
 * $\lambda=1$: (No substantive transformation)
 * $\lambda=\frac12$: (Square root plus linear transformation)
 * $\lambda=0$: (Natural logarithm)

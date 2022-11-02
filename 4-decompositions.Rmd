@@ -7,8 +7,8 @@ titlepage: Canberra16x9.jpg
 titlecolor: burntorange
 output:
   binb::monash:
+    latex_engine: xelatex
     colortheme: monashwhite
-    keep_tex: no
     fig_width: 7.5
     fig_height: 3
     includes:

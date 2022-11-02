@@ -7,6 +7,7 @@ titlepage: Canberra16x9.jpg
 titlecolor: burntorange
 output:
   binb::monash:
+    latex_engine: xelatex
     colortheme: monashwhite
     fig_width: 7.5
     fig_height: 3
@@ -481,4 +482,3 @@ fc |>
 * Which type of model works best?
 * Does the reconciliation improve the forecast accuracy?
 * Why doesn't the reconcililation make any difference to the SNAIVE forecasts?
-
