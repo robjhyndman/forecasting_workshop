@@ -125,7 +125,7 @@ tourism
 
 ## Australian tourism
 
-\begin{textblock}{10}(1,1.5)\small
+\begin{textblock}{10}(1,1.5)\fontsize{11}{12}\sf
 \begin{block}{}
   \begin{itemize}\itemsep=0cm\parskip=0cm
     \item Quarterly data on visitor night from 1998:Q1 -- 2013:Q4
@@ -390,7 +390,7 @@ fc |>
 ## Example: Australian tourism
 \fontsize{10}{11}\sf
 
-```{r fctourism3, dependson='fctourism'}
+```{r fctourism3, dependson='fctourism', fig.height=2.7}
 fc |>
   filter(is_aggregated(Purpose) & State == "Victoria" &
     is_aggregated(Region)) |>
@@ -482,7 +482,3 @@ fc |>
 * Does the reconciliation improve the forecast accuracy?
 * Why doesn't the reconcililation make any difference to the SNAIVE forecasts?
 
-## Survey
-\fontsize{30}{30}\sf\centering\bfseries
-
-rstd.io/ws-survey

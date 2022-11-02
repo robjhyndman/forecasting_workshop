@@ -43,11 +43,11 @@ vic_elec_daily <- vic_elec |>
 \[
   y_t = \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + \varepsilon_t,
 \]
-\end{block}
+\end{block}\vspace*{-0.1cm}
 
   * $y_t$ modeled as function of $k$ explanatory variables
   * In regression, we assume that $\varepsilon_t$ is white noise.
-\vspace*{0.3cm}
+\vspace*{0.1cm}
 \pause
 \begin{alertblock}{RegARIMA model}\vspace*{-0.2cm}
 \begin{align*}
@@ -69,7 +69,7 @@ us_change
 
 ## US personal consumption and income
 
-```{r usconsump, fig.height=6, fig.width=8.5}
+```{r usconsump, fig.height=4, fig.width=6, out.height="55%"}
 us_change |>
   pivot_longer(-Quarter, names_to = "variable", values_to = "value") |>
   ggplot(aes(y = value, x = Quarter, group = variable)) +
@@ -121,7 +121,7 @@ augment(fit) |>
 ## US personal consumption and income
 \fontsize{8}{8}\sf
 
-```{r usconsump3, echo=TRUE, fig.height=3, dependson='usconsump2'}
+```{r usconsump3, echo=TRUE, fig.height=1.9, dependson='usconsump2'}
 us_change_future <- new_data(us_change, 8) |>
   mutate(Income = tail(us_change$Income,1),
          Production =tail(us_change$Production,1),
@@ -149,7 +149,7 @@ Model daily electricity demand as a function of temperature using quadratic regr
 
 \fontsize{8}{9}\sf
 
-```{r, echo=TRUE, fig.height=3}
+```{r, echo=TRUE, fig.height=2.2}
 vic_elec_daily |>
   ggplot(aes(x = Temperature, y = Demand, colour = Day_Type)) +
   geom_point() +
@@ -159,7 +159,7 @@ vic_elec_daily |>
 ## Daily electricity demand
 \fontsize{8}{9}\sf
 
-```{r, echo=TRUE, fig.height=3.6}
+```{r, echo=TRUE, fig.height=2.8}
 vic_elec_daily |>
   pivot_longer(c(Demand, Temperature)) |>
   ggplot(aes(x = Date, y = value)) + geom_line() +
@@ -177,7 +177,6 @@ report(fit)
 ```
 
 ## Daily electricity demand
-\fontsize{8}{9}\sf
 
 ```{r, echo=TRUE, dependson='dailymodel'}
 augment(fit) |>
@@ -185,7 +184,6 @@ augment(fit) |>
 ```
 
 ## Daily electricity demand
-\fontsize{8}{9}\sf
 
 ```{r, echo=TRUE, dependson='dailymodel'}
 augment(fit) |>
@@ -232,9 +230,7 @@ forecast(fit, vic_elec_future) |>
 
 Repeat the daily electricity example, but instead of using a quadratic function of temperature, use a piecewise linear function with the "knot" around 20 degrees Celsius (use predictors `Temperature` & `Temp2`). How can you optimize the choice of knot?
 
-The data can be created as follows.
-
-\vspace*{-0.2cm}\fontsize{9}{9.5}\sf
+\vspace*{-0.2cm}\fontsize{8}{8.}\sf
 
 ```{r echo=TRUE, eval=FALSE}
 vic_elec_daily <- vic_elec |>
@@ -273,7 +269,7 @@ vic_elec_daily <- vic_elec |>
 ## Eating-out expenditure
 \fontsize{8}{9}\sf
 
-```{r cafe, echo=TRUE, fig.height=3.5, fig.width=8}
+```{r cafe, echo=TRUE, fig.height=2.5, fig.width=8}
 aus_cafe <- aus_retail |>
   filter(
     Industry == "Cafes, restaurants and takeaway food services",
@@ -285,7 +281,7 @@ aus_cafe |> autoplot(Turnover)
 
 ## Eating-out expenditure
 
-\fontsize{9}{10}\sf
+\fontsize{9}{9}\sf
 
 ```{r cafefit, dependson='cafe', fig.height=5, echo=TRUE, results='hide'}
 fit <- aus_cafe |> model(
@@ -306,7 +302,7 @@ glance(fit) |>
 
 ## Eating-out expenditure
 
-```{r}
+```{r, include=FALSE}
 cafe_plot <- function(...) {
   fit |>
     select(...) |>
@@ -363,17 +359,16 @@ options(width = 70)
 ```
 
 ```{r gasmodel, echo=TRUE}
-gasoline <- as_tsibble(fpp2::gasoline)
-fit <- gasoline |> model(ARIMA(value ~ fourier(K = 13) + PDQ(0, 0, 0)))
+fit <- us_gasoline |> model(ARIMA(Barrels ~ fourier(K = 13) + PDQ(0, 0, 0)))
 report(fit)
 ```
 
 ## Example: weekly gasoline products
 \fontsize{11}{12}\sf
 
-```{r gasf, echo=TRUE, fig.height=3.5}
+```{r gasf, echo=TRUE, fig.height=3}
 forecast(fit, h = "3 years") |>
-  autoplot(gasoline)
+  autoplot(us_gasoline)
 ```
 
 # Lab Session 19
@@ -412,11 +407,7 @@ where $\eta_t$ is an ARIMA process.\pause
   * $x$ can influence $y$, but $y$ is not allowed to influence $x$.
 
 ## Example: Insurance quotes and TV adverts
-
-```{r tvadvertdata}
-insurance <- as_tsibble(fpp2::insurance, pivot_longer = FALSE) |>
-  rename(Month = index)
-```
+\fontsize{12}{12}\sf
 
 ```{r tvadvertdata2}
 insurance
@@ -424,9 +415,9 @@ insurance
 
 ## Example: Insurance quotes and TV adverts
 
-```{r tvadvert, dependson='tvadvertdata'}
+```{r tvadvert, dependson='tvadvertdata', echo=FALSE}
 insurance |>
-  pivot_longer(c(Quotes, TV.advert)) |>
+  pivot_longer(c(Quotes, TVadverts)) |>
   ggplot(aes(x = Month, y = value)) + geom_line() +
   facet_grid(vars(name), scales = "free_y") +
   labs(x = "Year", y = NULL, title = "Insurance advertising and quotations")
@@ -434,15 +425,15 @@ insurance |>
 
 ## Example: Insurance quotes and TV adverts
 
-```{r tvadvertpairs, dependson='tvadvertdata'}
+```{r tvadvertpairs, dependson='tvadvertdata', echo=FALSE}
 insurance |>
   mutate(
-    lag1 = lag(TV.advert),
+    lag1 = lag(TVadverts),
     lag2 = lag(lag1)
   ) |>
   as_tibble() |>
   select(-Month) |>
-  rename(lag0 = TV.advert) |>
+  rename(lag0 = TVadverts) |>
   pivot_longer(-Quotes, names_to="Lag", values_to="TV_advert") |>
   ggplot(aes(x = TV_advert, y = Quotes)) + geom_point() +
   facet_grid(. ~ Lag) +
@@ -457,16 +448,16 @@ fit <- insurance |>
   # Restrict data so models use same fitting period
   mutate(Quotes = c(NA, NA, NA, Quotes[4:40])) |>
   model(
-    ARIMA(Quotes ~ pdq(d = 0) + TV.advert),
-    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
-                                lag(TV.advert)),
-    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
-                                lag(TV.advert) +
-                                lag(TV.advert, 2)),
-    ARIMA(Quotes ~ pdq(d = 0) + TV.advert +
-                                lag(TV.advert) +
-                                lag(TV.advert, 2) +
-                                lag(TV.advert, 3))
+    ARIMA(Quotes ~ pdq(d = 0) + TVadverts),
+    ARIMA(Quotes ~ pdq(d = 0) + TVadverts +
+                                lag(TVadverts)),
+    ARIMA(Quotes ~ pdq(d = 0) + TVadverts +
+                                lag(TVadverts) +
+                                lag(TVadverts, 2)),
+    ARIMA(Quotes ~ pdq(d = 0) + TVadverts +
+                                lag(TVadverts) +
+                                lag(TVadverts, 2) +
+                                lag(TVadverts, 3))
   )
 ```
 
@@ -489,7 +480,7 @@ glance(fit) |>
 ```{r tvadvertagain, echo=TRUE}
 # Re-fit to all data
 fit <- insurance |>
-  model(ARIMA(Quotes ~ TV.advert + lag(TV.advert) + pdq(d = 0)))
+  model(ARIMA(Quotes ~ TVadverts + lag(TVadverts) + pdq(d = 0)))
 report(fit)
 ```
 
@@ -503,8 +494,8 @@ phi1 <- coef["ar1"]
 theta1 <- coef["ma1"]
 theta2 <- coef["ma2"]
 intercept <- coef["intercept"]
-gamma0 <- coef["TV.advert"]
-gamma1 <- coef["lag(TV.advert)"]
+gamma0 <- coef["TVadverts"]
+gamma1 <- coef["lag(TVadverts)"]
 ```
 
 ###
@@ -521,26 +512,26 @@ gamma1 <- coef["lag(TV.advert)"]
 ## Example: Insurance quotes and TV adverts
 \fontsize{11}{13}\sf
 
-```{r, echo=TRUE, fig.height=3.3}
+```{r, echo=TRUE, fig.height=3}
 advert_a <- new_data(insurance, 20) |>
-  mutate(TV.advert = 10)
+  mutate(TVadverts = 10)
 forecast(fit, advert_a) |> autoplot(insurance)
 ```
 
 ## Example: Insurance quotes and TV adverts
 \fontsize{11}{13}\sf
 
-```{r, echo=TRUE, fig.height=3.3}
+```{r, echo=TRUE, fig.height=3}
 advert_b <- new_data(insurance, 20) |>
-  mutate(TV.advert = 8)
+  mutate(TVadverts = 8)
 forecast(fit, advert_b) |> autoplot(insurance)
 ```
 
 ## Example: Insurance quotes and TV adverts
 \fontsize{11}{13}\sf
 
-```{r, echo=TRUE, fig.height=3.3}
+```{r, echo=TRUE, fig.height=3}
 advert_c <- new_data(insurance, 20) |>
-  mutate(TV.advert = 6)
+  mutate(TVadverts = 6)
 forecast(fit, advert_c) |> autoplot(insurance)
 ```
