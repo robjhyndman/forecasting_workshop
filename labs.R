@@ -214,7 +214,8 @@ library(broom)
 
 ## Compute features
 PBS_feat <- PBS_no_zeros |>
-  features(Cost, feature_set(pkgs = "feasts"))
+  features(Cost, feature_set(pkgs = "feasts")) |> 
+  na.omit()
 
 ## Compute principal components
 PBS_prcomp <- PBS_feat |>
@@ -229,7 +230,7 @@ PBS_prcomp |>
 
 ## Pull out most unusual series from first principal component
 outliers <- PBS_prcomp |>
-  filter(.fittedPC1 == max(.fittedPC1))
+  filter(.fittedPC1 > 7)
 outliers
 
 ## Visualise the unusual series

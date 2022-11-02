@@ -1,14 +1,14 @@
-Tidy Time Series and Forecasting in R
+Time Series Analysis and Forecasting using R
 ================
 
-### rstudio::conf 2020
+### Canberra workshop: 2022
 
-by [Rob J Hyndman](https://robjhyndman.com)
+by [Rob J Hyndman](https://robjhyndman.com) and [Bahman Rostami-Tabar](http://bahmanrt.com)
 
-:spiral_calendar: 27-28 January 2020
+:spiral_calendar: 9-10 November 2022
 :alarm_clock:     09:00 - 17:00
-:hotel:           Imperial B (Ballroom Level)
-:writing_hand:    [rstd.io/conf](http://rstd.io/conf)
+:hotel:           Room 5.02, Marie Reay Teaching Building, ANU
+
 
 -----
 
@@ -160,13 +160,15 @@ vic_elec_daily <- vic_elec |>
   summarise(
     Demand = sum(Demand)/1e3,
     Temperature = max(Temperature),
-    Holiday = any(Holiday)) |>
+    Holiday = any(Holiday)
+  ) |>
   mutate(
     Temp2 = I(pmax(Temperature-20,0)),
     Day_Type = case_when(
       Holiday ~ "Holiday",
       wday(Date) %in% 2:6 ~ "Weekday",
-      TRUE ~ "Weekend"))
+      TRUE ~ "Weekend")
+  )
 ```
 
 ### Lab Session 19
@@ -180,10 +182,3 @@ Repeat Lab Session 16 but using all available data, and handling the annual seas
 * Which type of model works best?
 * Does the reconciliation improve the forecast accuracy?
 * Why doesn't the reconcililation make any difference to the SNAIVE forecasts?
-
-
------
-
-![](https://i.creativecommons.org/l/by/4.0/88x31.png) This work is
-licensed under a [Creative Commons Attribution 4.0 International
-License](https://creativecommons.org/licenses/by/4.0/).
