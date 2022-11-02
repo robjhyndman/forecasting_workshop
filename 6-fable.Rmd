@@ -557,6 +557,9 @@ fb_stock |> autoplot(Close)
 \fontsize{10}{10}\sf
 
 ```{r augment}
+fb_stock <- fb_stock |> 
+  mutate(trading_day = row_number()) |>
+  update_tsibble(index = trading_day, regular = TRUE) 
 fit <- fb_stock |> model(NAIVE(Close))
 augment(fit)
 ```
@@ -564,7 +567,7 @@ augment(fit)
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4, echo=TRUE, warning=FALSE, fig.height=2.5}
+```{r dj4, echo=TRUE, warning=FALSE, fig.height=2.5, dependson="augment"}
 augment(fit) |>
   ggplot(aes(x = trading_day)) +
   geom_line(aes(y = Close, colour = "Data")) +
@@ -574,7 +577,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4a, echo=TRUE, warning=FALSE, fig.height=2.5}
+```{r dj4a, echo=TRUE, warning=FALSE, fig.height=2.5, dependson="augment"}
 augment(fit) |>
   filter(trading_day > 1100) |>
   ggplot(aes(x = trading_day)) +
@@ -585,7 +588,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj5, echo=TRUE, warning = FALSE}
+```{r dj5, echo=TRUE, warning = FALSE, dependson="augment"}
 augment(fit) |>
   autoplot(.resid) + xlab("Day") + ylab("") +
   ggtitle("Residuals from naïve method")
@@ -594,7 +597,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{11}{11}\sf
 
-```{r dj6, warning=FALSE, fig.height=2.7}
+```{r dj6, warning=FALSE, fig.height=2.7, dependson="augment"}
 augment(fit) |>
   ggplot(aes(x = .resid)) +
   geom_histogram(bins = 150) +
@@ -604,7 +607,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{11}{11}\sf
 
-```{r dj7}
+```{r dj7, dependson="augment"}
 augment(fit) |>
   ACF(.resid) |>
   autoplot() + ggtitle("ACF of residuals")
@@ -621,7 +624,7 @@ augment(fit) |>
 ## Combined diagnostic graph
 \fontsize{11}{11}\sf
 
-```{r dj8}
+```{r dj8, dependson="augment"}
 fit |> gg_tsresiduals()
 ```
 
@@ -661,7 +664,7 @@ augment(fit) |>
 
 \vspace*{-0.3cm}
 
-```{r dj9, echo=TRUE}
+```{r dj9, echo=TRUE, dependson="augment"}
 # lag=h and dof=K
 augment(fit) |> features(.resid, ljung_box, dof = 0, lag = 10)
 ```
