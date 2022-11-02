@@ -21,7 +21,7 @@ library(purrr)
 library(transformr) # Just to get it on renv
 library(gganimate)
 library(latex2exp)
-tourism <- tourism %>%
+tourism <- tourism |>
   mutate(
     State = recode(State,
       "Australian Capital Territory" = "ACT",
@@ -74,8 +74,8 @@ where & $y_t=$ & data at period $t$ \\
 \fontsize{11}{11}\sf
 
 ```{r usretail}
-us_retail_employment <- us_employment %>%
-  filter(year(Month) >= 1990, Title == "Retail Trade") %>%
+us_retail_employment <- us_employment |>
+  filter(year(Month) >= 1990, Title == "Retail Trade") |>
   select(-Series_ID)
 us_retail_employment
 ```
@@ -85,7 +85,7 @@ us_retail_employment
 ## US Retail Employment
 
 ```{r dable1}
-us_retail_employment %>%
+us_retail_employment |>
   autoplot(Employed) +
   labs(y="Persons (thousands)", title="Total employment in US retail")
 ```
@@ -96,7 +96,7 @@ us_retail_employment %>%
 \fontsize{11}{11}\sf
 
 ```{r dable2}
-dcmp <- us_retail_employment %>%
+dcmp <- us_retail_employment |>
   model(stl = STL(Employed))
 dcmp
 ```
@@ -115,13 +115,13 @@ components(dcmp)
 ## US Retail Employment
 
 ```{r usretail-stl, fig.width=8, fig.height=5}
-components(dcmp) %>% autoplot()
+components(dcmp) |> autoplot()
 ```
 
 ## US Retail Employment
 
 ```{r dable4, fig.height=2.7}
-us_retail_employment %>%
+us_retail_employment |>
   autoplot(Employed, color='gray') +
   autolayer(components(dcmp), trend, color='#D55E00') +
   labs(y="Persons (thousands)", title="Total employment in US retail")
@@ -133,7 +133,7 @@ us_retail_employment %>%
 ## US Retail Employment
 
 ```{r usretail3}
-components(dcmp) %>% gg_subseries(season_year)
+components(dcmp) |> gg_subseries(season_year)
 ```
 
 ## Seasonal adjustment
@@ -147,7 +147,7 @@ $$y_t / S_t = T_t \times R_t$$
 ## US Retail Employment
 
 ```{r usretail-sa, fig.height=2.7}
-us_retail_employment %>%
+us_retail_employment |>
   autoplot(Employed, color='gray') +
   autolayer(components(dcmp), season_adjust, color='#0072B2') +
   labs(y="Persons (thousands)", title="Total employment in US retail")
@@ -168,13 +168,13 @@ stl_defs <- purrr::map(s_windows, function(s_window){
 })
 names(stl_defs) <- sprintf("season(window=%02d)", s_windows)
 
-us_retail_employment %>%
-  model(!!!stl_defs) %>%
-  components() %>%
-  as_tibble() %>%
+us_retail_employment |>
+  model(!!!stl_defs) |>
+  components() |>
+  as_tibble() |>
   pivot_longer(Employed:remainder,
                names_to = "component", names_ptypes = list(component = factor(levels = c("Employed", "trend", "season_year", "remainder"))),
-               values_to = "Employed") %>%
+               values_to = "Employed") |>
   ggplot(aes(x = Month, y = Employed)) +
   geom_line() +
   facet_grid(rows = vars(component), scales = "free_y") +
@@ -188,9 +188,9 @@ us_retail_employment %>%
 ## STL decomposition
 
 ```{r echo = TRUE, results = 'hide'}
-us_retail_employment %>%
+us_retail_employment |>
   model(STL(Employed ~ trend(window=15) + season(window="periodic"),
-            robust = TRUE)) %>% 
+            robust = TRUE)) |>
   components()
 ```
 
@@ -203,9 +203,9 @@ us_retail_employment %>%
 ## STL decomposition
 
 ```{r mstl, fig.width=8.5, fig.height=3.4}
-us_retail_employment %>%
-  model(STL(Employed)) %>%
-  components() %>% autoplot()
+us_retail_employment |>
+  model(STL(Employed)) |>
+  components() |> autoplot()
 ```
 
 \only<2>{\begin{textblock}{7}(8,0.2)\fontsize{11}{11}\sf
@@ -233,14 +233,14 @@ us_retail_employment %>%
 ## Australian holidays
 
 ```{r holidays, include=FALSE}
-holidays <- tourism %>%
-  filter(Purpose == "Holiday") %>%
-  group_by(State) %>%
+holidays <- tourism |>
+  filter(Purpose == "Holiday") |>
+  group_by(State) |>
   summarise(Trips = sum(Trips))
 ```
 
 ```{r holidays-plot2, echo=TRUE, dependson="holidays", fig.height=2.8}
-holidays %>% autoplot(Trips) +
+holidays |> autoplot(Trips) +
   ylab("thousands of trips") + xlab("Year") +
   ggtitle("Australian domestic holiday nights")
 ```
@@ -248,18 +248,18 @@ holidays %>% autoplot(Trips) +
 ## Decomposition plot
 
 ```{r stlagain2, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
-holidays %>%
-  model(stl = STL(Trips ~ season(window = 7))) %>%
-  components() %>%
+holidays |>
+  model(stl = STL(Trips ~ season(window = 7))) |>
+  components() |>
   autoplot()
 ```
 
 ## Decomposition plot
 
 ```{r stlagain3, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
-holidays %>%
-  model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) %>%
-  components() %>%
+holidays |>
+  model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) |>
+  components() |>
   autoplot()
 ```
 
@@ -267,9 +267,9 @@ holidays %>%
 ## Decomposition subseries
 
 ```{r elecequip3}
-dcmp <- holidays %>% model(stl = STL(Trips)) %>%
+dcmp <- holidays |> model(stl = STL(Trips)) |>
   components()
-dcmp %>% gg_subseries(season_year)
+dcmp |> gg_subseries(season_year)
 ```
 
 ## Decomposition trend
@@ -285,7 +285,7 @@ autoplot(dcmp) +
 \fontsize{8}{9}\sf
 
 ```r
-holidays %>%
+holidays |>
   model(stl = STL(Trips ~ trend(window=15) + season(window=13),
       robust = TRUE))
 ```
@@ -302,7 +302,7 @@ holidays %>%
 \fontsize{9}{10}\sf
 
 ```{r holidays2}
-dcmp <- holidays %>% model(stl = STL(Trips)) %>% components()
+dcmp <- holidays |> model(stl = STL(Trips)) |> components()
 dcmp
 ```
 
@@ -310,7 +310,7 @@ dcmp
 \fontsize{9}{10}\sf
 
 ```{r holidays3, fig.height=4.6}
-dcmp %>% gg_subseries(season_year)
+dcmp |> gg_subseries(season_year)
 ```
 
 ## Holidays decomposition
@@ -331,9 +331,9 @@ autoplot(dcmp, trend, scale_bars = FALSE) +
     \fontsize{9}{11}\sf
 
     ```r
-    canadian_gas %>%
-      model(STL(Volume ~ season(window=7) + trend(window=11))) %>%
-      components() %>%
+    canadian_gas |>
+      model(STL(Volume ~ season(window=7) + trend(window=11))) |>
+      components() |>
       autoplot()
     ```
 
@@ -351,17 +351,17 @@ autoplot(dcmp, trend, scale_bars = FALSE) +
 \fontsize{9}{9}\sf
 
 ```r
-vic_elec %>%
-  model(STL(Demand)) %>%
-  components() %>%
+vic_elec |>
+  model(STL(Demand)) |>
+  components() |>
   autoplot()
 ```
 
 ```{r vic_elec, echo=FALSE}
 png("figs/vic_elec_stl.png", width = 18, height=18, res=300, units="cm", type = "cairo-png")
-vic_elec %>%
-  model(STL(Demand)) %>%
-  components() %>%
+vic_elec |>
+  model(STL(Demand)) |>
+  components() |>
   autoplot()
 crop::dev.off.crop()
 ```
@@ -431,11 +431,11 @@ employed <- tsibble(
     11622, 11593
   ),
   index = Time
-) %>%
+) |>
   mutate(
     Month = month(Time, label = TRUE),
     Year = year(Time)
-  ) %>%
+  ) |>
   select(Time, Month, Year, Employed)
 ```
 
@@ -448,7 +448,7 @@ employed
 ## The ABS stuff-up
 
 ```{r abs3}
-employed %>%
+employed |>
   autoplot(Employed) +
   labs(title = "Total employed", y = "Thousands")
 ```
@@ -456,8 +456,8 @@ employed %>%
 ## The ABS stuff-up
 
 ```{r abs4, fig.height=2.8}
-employed %>%
-  filter(Year >= 2005) %>%
+employed |>
+  filter(Year >= 2005) |>
   autoplot(Employed) +
   labs(title = "Total employed", y = "Thousands")
 ```
@@ -465,8 +465,8 @@ employed %>%
 ## The ABS stuff-up
 
 ```{r abs5, fig.height=2.8}
-employed %>%
-  filter(Year >= 2005) %>%
+employed |>
+  filter(Year >= 2005) |>
   gg_season(Employed, labels = "right") +
   labs(title = "Total employed", y = "Thousands")
 ```
@@ -474,9 +474,9 @@ employed %>%
 ## The ABS stuff-up
 
 ```{r abs6, fig.height=2}
-employed %>%
-  mutate(diff = difference(Employed)) %>%
-  filter(Month == "Sep") %>%
+employed |>
+  mutate(diff = difference(Employed)) |>
+  filter(Month == "Sep") |>
   ggplot(aes(y = diff, x = 1)) +
   geom_boxplot() + coord_flip() +
   labs(title = "Sep - Aug: total employed", y = "Thousands") +
@@ -486,17 +486,17 @@ employed %>%
 ## The ABS stuff-up
 
 ```{r abs7, fig.height=2.8}
-dcmp <- employed %>%
-  filter(Year >= 2005) %>%
+dcmp <- employed |>
+  filter(Year >= 2005) |>
   model(stl = STL(Employed ~ season(window = 11), robust = TRUE))
-components(dcmp) %>% autoplot()
+components(dcmp) |> autoplot()
 ```
 
 ## The ABS stuff-up
 
 ```{r abs8, fig.height=2.8}
-components(dcmp) %>%
-  filter(year(Time) == 2013) %>%
+components(dcmp) |>
+  filter(year(Time) == 2013) |>
   gg_season(season_year) +
   labs(title = "Seasonal component") + guides(colour = "none")
 ```
@@ -504,8 +504,8 @@ components(dcmp) %>%
 ## The ABS stuff-up
 
 ```{r abs9}
-components(dcmp) %>%
-  as_tsibble() %>%
+components(dcmp) |>
+  as_tsibble() |>
   autoplot(season_adjust)
 ```
 

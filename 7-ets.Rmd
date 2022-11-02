@@ -16,9 +16,9 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-melsyd <- tsibbledata::ansett %>%
+melsyd <- tsibbledata::ansett |>
   filter(Airports == "MEL-SYD")
-austa <- as_tsibble(fpp2::austa) %>%
+austa <- as_tsibble(fpp2::austa) |>
   rename(Year = index, Visitors = value)
 ```
 
@@ -159,10 +159,10 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 \fontsize{9}{9}\sf
 
 ```{r holt-fit, echo=TRUE}
-aus_economy <- global_economy %>%
-  filter(Code == "AUS") %>%
+aus_economy <- global_economy |>
+  filter(Code == "AUS") |>
   mutate(Pop = Population / 1e6)
-fit <- aus_economy %>% model(AAN = ETS(Pop))
+fit <- aus_economy |> model(AAN = ETS(Pop))
 report(fit)
 ```
 
@@ -179,7 +179,7 @@ components(fit)
 \fontsize{10}{11}\sf
 
 ```{r holt-cmp-plot, echo=TRUE, dependson='holt-fit', fig.height=4.5}
-components(fit) %>% autoplot()
+components(fit) |> autoplot()
 ```
 
 ## Example: Australian population
@@ -187,8 +187,8 @@ components(fit) %>% autoplot()
 \fontsize{12}{12}\sf
 
 ```{r holt-fc, echo=TRUE, cache=TRUE, dependson='holt-fit', fig.height=2.7}
-fit %>%
-  forecast(h = 20) %>%
+fit |>
+  forecast(h = 20) |>
   autoplot(aus_economy) +
   ylab("Population") + xlab("Year")
 ```
@@ -215,9 +215,9 @@ fit %>%
 \fontsize{12}{12}\sf
 
 ```{r, echo=TRUE, fig.height=2.7}
-aus_economy %>%
-  model(holt = ETS(Pop ~ trend("Ad"))) %>%
-  forecast(h = 20) %>%
+aus_economy |>
+  model(holt = ETS(Pop ~ trend("Ad"))) |>
+  forecast(h = 20) |>
   autoplot(aus_economy)
 ```
 
@@ -226,8 +226,8 @@ aus_economy %>%
 \fontsize{9}{9}\sf
 
 ```{r popfit, echo=TRUE, cache=TRUE}
-fit <- global_economy %>%
-  mutate(Pop = Population / 1e6) %>%
+fit <- global_economy |>
+  mutate(Pop = Population / 1e6) |>
   model(ets = ETS(Pop))
 fit
 ```
@@ -236,7 +236,7 @@ fit
 \fontsize{12}{12}\sf
 
 ```{r popfc, echo=TRUE, cache=TRUE, dependson="popfit"}
-fit %>%
+fit |>
   forecast(h = 5)
 ```
 
@@ -288,9 +288,9 @@ Experiment with the various options in the `ETS()` function to see how much the 
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-fit, echo=TRUE}
-holidays <- tourism %>%
+holidays <- tourism |>
   filter(Purpose == "Holiday")
-fit <- holidays %>% model(ets = ETS(Trips))
+fit <- holidays |> model(ets = ETS(Trips))
 fit
 ```
 
@@ -299,8 +299,8 @@ fit
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-report}
-fit %>%
-  filter(Region == "Snowy Mountains") %>%
+fit |>
+  filter(Region == "Snowy Mountains") |>
   report()
 ```
 
@@ -309,8 +309,8 @@ fit %>%
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-components}
-fit %>%
-  filter(Region == "Snowy Mountains") %>%
+fit |>
+  filter(Region == "Snowy Mountains") |>
   components(fit)
 ```
 
@@ -319,9 +319,9 @@ fit %>%
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-components-plot}
-fit %>%
-  filter(Region == "Snowy Mountains") %>%
-  components(fit) %>% autoplot()
+fit |>
+  filter(Region == "Snowy Mountains") |>
+  components(fit) |> autoplot()
 ```
 
 ## Example: Australian holiday tourism
@@ -329,7 +329,7 @@ fit %>%
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-forecast}
-fit %>% forecast()
+fit |> forecast()
 ```
 
 ## Example: Australian holiday tourism
@@ -337,9 +337,9 @@ fit %>% forecast()
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-forecast-plot, fig.height=2.5}
-fit %>%
-  forecast() %>%
-  filter(Region == "Snowy Mountains") %>%
+fit |>
+  forecast() |>
+  filter(Region == "Snowy Mountains") |>
   autoplot(holidays) +
   xlab("Year") + ylab("Overnight trips (thousands)")
 ```
@@ -443,11 +443,11 @@ Find an ETS model for the Gas data from `aus_production`.
 \fontsize{8.8}{9}\sf
 
 ```{r cafe, fig.height=2.4}
-vic_cafe <- tsibbledata::aus_retail %>%
+vic_cafe <- tsibbledata::aus_retail |>
   filter(State == "Victoria",
-         Industry == "Cafes, restaurants and catering services") %>%
+         Industry == "Cafes, restaurants and catering services") |>
   select(Month, Turnover)
-vic_cafe %>%
+vic_cafe |>
   autoplot(Turnover) + ggtitle("Monthly turnover of Victorian cafes")
 ```
 
@@ -455,14 +455,14 @@ vic_cafe %>%
 \fontsize{8.8}{9}\sf
 
 ```{r}
-vic_cafe %>% autoplot(box_cox(Turnover, lambda = 0.2))
+vic_cafe |> autoplot(box_cox(Turnover, lambda = 0.2))
 ```
 
 ## Forecasting with transformations
 \fontsize{8.8}{9}\sf
 
 ```{r}
-fit <- vic_cafe %>%
+fit <- vic_cafe |>
   model(ets = ETS(box_cox(Turnover, 0.2)))
 fit
 ```
@@ -473,7 +473,7 @@ if(!identical(fabletools:::model_sum(fit$ets[[1]]), "ETS(A,A,A)"))
 ```
 
 ```{r}
-(fc <- fit %>% forecast(h = "3 years"))
+(fc <- fit |> forecast(h = "3 years"))
 ```
 
 \only<2>{\begin{textblock}{5.5}(9.8,2.8)\fontsize{13}{14}\sf
@@ -489,14 +489,14 @@ if(!identical(fabletools:::model_sum(fit$ets[[1]]), "ETS(A,A,A)"))
 \fontsize{8.8}{9}\sf
 
 ```{r}
-fc %>% autoplot(vic_cafe)
+fc |> autoplot(vic_cafe)
 ```
 
 ## Bootstrapped forecast distributions
 \fontsize{8.8}{9}\sf
 
 ```{r}
-sim <- fit %>% generate(h = "3 years", times = 5, bootstrap = TRUE)
+sim <- fit |> generate(h = "3 years", times = 5, bootstrap = TRUE)
 sim
 ```
 
@@ -504,8 +504,8 @@ sim
 \fontsize{8.8}{9}\sf
 
 ```{r, fig.height=2.3}
-vic_cafe %>%
-  filter(year(Month) >= 2008) %>%
+vic_cafe |>
+  filter(year(Month) >= 2008) |>
   ggplot(aes(x = Month)) +
   geom_line(aes(y = Turnover)) +
   geom_line(aes(y = .sim, colour = as.factor(.rep)), data = sim) +
@@ -517,7 +517,7 @@ vic_cafe %>%
 \fontsize{8.8}{9}\sf
 
 ```{r}
-fc <- fit %>% forecast(h = "3 years", bootstrap = TRUE)
+fc <- fit |> forecast(h = "3 years", bootstrap = TRUE)
 fc
 ```
 
@@ -525,6 +525,6 @@ fc
 \fontsize{8.8}{9}\sf
 
 ```{r}
-fc %>% autoplot(vic_cafe) +
+fc |> autoplot(vic_cafe) +
   ggtitle("Monthly turnover of Victorian cafes")
 ```

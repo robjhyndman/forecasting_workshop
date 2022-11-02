@@ -32,7 +32,7 @@ by [Rob J Hyndman](https://robjhyndman.com)
 1. Look at the quarterly tourism data for the Snowy Mountains
 
     ```r
-    snowy <- tourism %>% filter(Region == "Snowy Mountains")
+    snowy <- tourism |> filter(Region == "Snowy Mountains")
     ```
 
     - Use `autoplot()`, `gg_season()` and `gg_subseries()` to explore the data.
@@ -49,10 +49,10 @@ We have introduced the following functions: `gg_lag` and `ACF`. Use these functi
 You can compute the daily changes in the Google stock price in 2018 using
 
 ```{r, eval = FALSE}
-dgoog <- gafa_stock %>%
-  filter(Symbol == "GOOG", year(Date) >= 2018) %>%
-  mutate(trading_day = row_number()) %>%
-  update_tsibble(index=trading_day, regular=TRUE) %>%
+dgoog <- gafa_stock |>
+  filter(Symbol == "GOOG", year(Date) >= 2018) |>
+  mutate(trading_day = row_number()) |>
+  update_tsibble(index=trading_day, regular=TRUE) |>
   mutate(diff = difference(Close))
 ```
 
@@ -78,8 +78,8 @@ Consider the GDP information in `global_economy`. Plot the GDP per capita for ea
 1. Produce the following decomposition
 
     ```r
-    canadian_gas %>%
-      STL(Volume ~ season(window=7) + trend(window=11)) %>%
+    canadian_gas |>
+      STL(Volume ~ season(window=7) + trend(window=11)) |>
       autoplot()
     ```
 
@@ -154,13 +154,13 @@ Repeat the daily electricity example, but instead of using a quadratic function 
 The data can be created as follows.
 
 ```{r echo=TRUE, eval=FALSE}
-vic_elec_daily <- vic_elec %>%
-  filter(year(Time) == 2014) %>%
-  index_by(Date = date(Time)) %>%
+vic_elec_daily <- vic_elec |>
+  filter(year(Time) == 2014) |>
+  index_by(Date = date(Time)) |>
   summarise(
     Demand = sum(Demand)/1e3,
     Temperature = max(Temperature),
-    Holiday = any(Holiday)) %>%
+    Holiday = any(Holiday)) |>
   mutate(
     Temp2 = I(pmax(Temperature-20,0)),
     Day_Type = case_when(

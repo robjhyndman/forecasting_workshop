@@ -154,7 +154,7 @@ install.packages(c("tidyverse","fpp3","GGally", "sugrrants"))
 1.  Look at the quarterly tourism data for the Snowy Mountains
 
     ``` r
-    snowy <- tourism %>% filter(Region == "Snowy Mountains")
+    snowy <- tourism |> filter(Region == "Snowy Mountains")
     ```
 
     -   Use `autoplot()`, `gg_season()` and `gg_subseries()` to explore
@@ -179,10 +179,10 @@ using
 
 ::: {.cell hash="README_cache/markdown/unnamed-chunk-1_406af2e0fc561a1315329ab2e55daaa0"}
 ``` {.r .cell-code}
-dgoog <- gafa_stock %>%
-  filter(Symbol == "GOOG", year(Date) >= 2018) %>%
-  mutate(trading_day = row_number()) %>%
-  update_tsibble(index=trading_day, regular=TRUE) %>%
+dgoog <- gafa_stock |>
+  filter(Symbol == "GOOG", year(Date) >= 2018) |>
+  mutate(trading_day = row_number()) |>
+  update_tsibble(index=trading_day, regular=TRUE) |>
   mutate(diff = difference(Close))
 ```
 :::
@@ -214,8 +214,8 @@ capita? How has this changed over time?
 1.  Produce the following decomposition
 
     ``` r
-    canadian_gas %>%
-      STL(Volume ~ season(window=7) + trend(window=11)) %>%
+    canadian_gas |>
+      STL(Volume ~ season(window=7) + trend(window=11)) |>
       autoplot()
     ```
 
@@ -313,13 +313,13 @@ The data can be created as follows.
 
 ::: {.cell hash="README_cache/markdown/unnamed-chunk-2_c0f3b814eeb27b7e5c0ed498d8a2e460"}
 ``` {.r .cell-code}
-vic_elec_daily <- vic_elec %>%
-  filter(year(Time) == 2014) %>%
-  index_by(Date = date(Time)) %>%
+vic_elec_daily <- vic_elec |>
+  filter(year(Time) == 2014) |>
+  index_by(Date = date(Time)) |>
   summarise(
     Demand = sum(Demand)/1e3,
     Temperature = max(Temperature),
-    Holiday = any(Holiday)) %>%
+    Holiday = any(Holiday)) |>
   mutate(
     Temp2 = I(pmax(Temperature-20,0)),
     Day_Type = case_when(

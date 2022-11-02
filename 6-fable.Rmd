@@ -16,10 +16,10 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-h02 <- tsibbledata::PBS %>%
-  filter(ATC2 == "H02") %>%
+h02 <- tsibbledata::PBS |>
+  filter(ATC2 == "H02") |>
   summarise(Cost = sum(Cost))
-melsyd <- tsibbledata::ansett %>%
+melsyd <- tsibbledata::ansett |>
   filter(Airports == "MEL-SYD")
 ```
 
@@ -87,35 +87,35 @@ Something is easier to forecast if:
 
 ```{r austa, echo=FALSE}
 # Grab ABS data
-austa <- readxl::read_excel("data/340101.xlsx", sheet="Data1", skip=9) %>%
-  rename(date = `Series ID`, value = A85375847A) %>%
-  select(date, value) %>%
+austa <- readxl::read_excel("data/340101.xlsx", sheet="Data1", skip=9) |>
+  rename(date = `Series ID`, value = A85375847A) |>
+  select(date, value) |>
   transmute(
     Month = yearmonth(date),
     Visitors = value / 1e3
-  ) %>%
+  ) |>
   bind_rows(tibble(
     Month = yearmonth(seq(as.Date("2021-11-01"), by = "1 month", length = 2)),
     Visitors = NA_real_
-  )) %>%
-  as_tsibble(index = Month) %>%
+  )) |>
+  as_tsibble(index = Month) |>
   filter(Month >= yearmonth("2000 Jan"))
 # Fit ETS model
-fit <- austa %>%
-  filter(Month < yearmonth("2018 Jan")) %>%
+fit <- austa |>
+  filter(Month < yearmonth("2018 Jan")) |>
   model(ETS(Visitors))
 # Product forecasts
-fc <- forecast(fit, h = 48) %>%
+fc <- forecast(fit, h = 48) |>
   mutate(Month = as.Date(Month))
 # Simulate 100 future sample paths
 set.seed(1967)
-sim <- fit %>%
-  generate(h = 48, times = 100) %>%
+sim <- fit |>
+  generate(h = 48, times = 100) |>
   mutate(
     replicate = factor(.rep, levels = 1:100, labels = paste("Future", 1:100)),
     .rep = as.numeric(.rep)
-  ) %>%
-  as_tibble() %>%
+  ) |>
+  as_tibble() |>
   mutate(Month = as.Date(Month))
 # Nice colors
 cols <- scale_colour_manual(
@@ -124,10 +124,10 @@ cols <- scale_colour_manual(
   name = " "
 )
 # Now build up some plots with alignment
-p1 <- austa %>%
-  mutate(Visitors = if_else(Month >= yearmonth("2018 Jan"), NA_real_, Visitors)) %>%
-  as_tibble() %>%
-  mutate(Month = as.Date(Month)) %>%
+p1 <- austa |>
+  mutate(Visitors = if_else(Month >= yearmonth("2018 Jan"), NA_real_, Visitors)) |>
+  as_tibble() |>
+  mutate(Month = as.Date(Month)) |>
   ggplot(aes(x = Month, y = Visitors)) +
   geom_line() +
   labs(
@@ -143,19 +143,19 @@ p1 <- austa %>%
   ylim(min(austa$Visitors, sim$.sim, na.rm = TRUE), max(austa$Visitors, sim$.sim, na.rm = TRUE))
 p2 <- p1 + cols +
   geom_line(aes(y = .sim, group = replicate, colour = replicate),
-    data = sim %>% filter(.rep <= 1)
+    data = sim |> filter(.rep <= 1)
   )
 p3 <- p1 + cols +
   geom_line(aes(y = .sim, group = replicate, colour = replicate),
-    data = sim %>% filter(.rep <= 2)
+    data = sim |> filter(.rep <= 2)
   )
 p4 <- p1 + cols +
   geom_line(aes(y = .sim, group = replicate, colour = replicate),
-    data = sim %>% filter(.rep <= 3)
+    data = sim |> filter(.rep <= 3)
   )
 p5 <- p1 + cols +
   geom_line(aes(y = .sim, group = replicate, colour = replicate),
-    data = sim %>% filter(.rep <= 10)
+    data = sim |> filter(.rep <= 10)
   )
 p6 <- p1 + cols +
   geom_line(aes(y = .sim, group = replicate, colour = replicate), alpha = 0.5, data = sim) +
@@ -267,7 +267,7 @@ aligned_plots[[9]]
 aligned_plots[[9]] +
   geom_line(
     colour = "black",
-    data = austa %>% filter(Month >= yearmonth("2018 Jan")) %>% mutate(Month = as.Date(Month))
+    data = austa |> filter(Month >= yearmonth("2018 Jan")) |> mutate(Month = as.Date(Month))
   )
 ```
 
@@ -293,9 +293,9 @@ aligned_plots[[9]] +
 ## Some simple forecasting methods
 
 ```{r ausbeer, fig.height=4.6, echo=FALSE}
-new_production <- aus_production %>%
+new_production <- aus_production |>
   filter(year(Quarter) >= 1992)
-new_production %>% autoplot(Beer) +
+new_production |> autoplot(Beer) +
   xlab("Year") + ylab("megalitres") +
   ggtitle("Australian quarterly beer production")
 ```
@@ -309,11 +309,11 @@ new_production %>% autoplot(Beer) +
 ## Some simple forecasting methods
 
 ```{r pigs, fig.height=4.6, echo=FALSE}
-aus_livestock %>%
+aus_livestock |>
   filter(
     between(year(Month), 1992, 1996),
     Animal == "Pigs", State == "Victoria"
-  ) %>%
+  ) |>
   autoplot(Count) +
   xlab("Year") + ylab("thousands") +
   ggtitle("Number of pigs slaughtered in Victoria, 1990-1995")
@@ -328,8 +328,8 @@ aus_livestock %>%
 ## Some simple forecasting methods
 
 ```{r dj, fig.height=4.6, echo=FALSE}
-gafa_stock %>%
-  filter(Symbol == "FB", Date >= ymd("2018-01-01")) %>%
+gafa_stock |>
+  filter(Symbol == "FB", Date >= ymd("2018-01-01")) |>
   autoplot(Close) +
   labs(
     title = "Facebook closing stock price in 2018",
@@ -352,15 +352,15 @@ gafa_stock %>%
   * Forecasts: $\hat{y}_{T+h|T} = \bar{y} = (y_1+\dots+y_T)/T$
 
 ```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 2.7}
-bricks <- aus_production %>%
-  filter(!is.na(Bricks)) %>%
+bricks <- aus_production |>
+  filter(!is.na(Bricks)) |>
   mutate(average = mean(Bricks))
 
-fc <- bricks %>%
-  model(MEAN(Bricks)) %>%
+fc <- bricks |>
+  model(MEAN(Bricks)) |>
   forecast(h = "5 years")
 
-bricks %>%
+bricks |>
   ggplot(aes(x = Quarter, y = Bricks)) +
   geom_line() +
   geom_line(aes(y = average), colour = "blue", linetype = "dashed") +
@@ -378,10 +378,10 @@ bricks %>%
   * Consequence of efficient market hypothesis.
 
 ```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
-bricks %>%
-  filter(!is.na(Bricks)) %>%
-  model(NAIVE(Bricks)) %>%
-  forecast(h = "5 years") %>%
+bricks |>
+  filter(!is.na(Bricks)) |>
+  model(NAIVE(Bricks)) |>
+  forecast(h = "5 years") |>
   autoplot(filter(bricks, year(Quarter) > 1990), level = NULL) +
   geom_point(aes(y = Bricks), data = slice(bricks, n()), colour = "blue") +
   ggtitle("Clay brick production in Australia")
@@ -396,9 +396,9 @@ bricks %>%
   * Forecasts: $\hat{y}_{T+h|T} =y_{T+h-m(k+1)}$, where $m=$ seasonal period and $k$ is the integer part of $(h-1)/m$.
 
 ```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
-bricks %>%
-  model(SNAIVE(Bricks ~ lag("year"))) %>%
-  forecast(h = "5 years") %>%
+bricks |>
+  model(SNAIVE(Bricks ~ lag("year"))) |>
+  forecast(h = "5 years") |>
   autoplot(filter(bricks, year(Quarter) > 1990), level = NULL) +
   geom_point(aes(y = Bricks), data = slice(bricks, (n() - 3):n()), colour = "blue") +
   ggtitle("Clay brick production in Australia")
@@ -424,10 +424,10 @@ bricks %>%
 ### Drift method
 
 ```{r drift-method-explained, echo = FALSE, warning = FALSE}
-aus_production %>%
-  filter(!is.na(Bricks)) %>%
-  model(RW(Bricks ~ drift())) %>%
-  forecast(h = "5 years") %>%
+aus_production |>
+  filter(!is.na(Bricks)) |>
+  model(RW(Bricks ~ drift())) |>
+  forecast(h = "5 years") |>
   autoplot(aus_production, level = NULL) +
   geom_line(
     aes(y = Bricks),
@@ -444,8 +444,8 @@ The `model()` function trains models to data.
 \fontsize{10}{11}\sf
 
 ```{r brick-model}
-brick_fit <-  aus_production %>%
-  filter(!is.na(Bricks)) %>%
+brick_fit <-  aus_production |>
+  filter(!is.na(Bricks)) |>
   model(
     `Seasonal_naïve` = SNAIVE(Bricks),
     `Naïve` = NAIVE(Bricks),
@@ -467,7 +467,7 @@ A \texttt{mable} is a model table, each cell corresponds to a fitted model.
 \fontsize{10}{13}\sf
 
 ```{r brick-fc, echo = TRUE, dependson='brick-model'}
-brick_fc <- brick_fit %>%
+brick_fc <- brick_fit |>
   forecast(h = "5 years")
 ```
 
@@ -484,7 +484,7 @@ A \texttt{fable} is a forecast table with point forecasts and distributions.
 \footnotesize
 
 ```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=2.6, dependson='brick-fc'}
-brick_fc %>%
+brick_fc |>
   autoplot(aus_production, level = NULL) +
   ggtitle("Forecasts for quarterly clay brick production") +
   xlab("Year") + ylab("Millions of bricks") +
@@ -495,14 +495,14 @@ brick_fc %>%
 \fontsize{10}{12}\sf
 
 ```{r brick-fc-interval, dependson='brick-fc'}
-brick_fc %>% hilo(level=c(50,75))
+brick_fc |> hilo(level=c(50,75))
 ```
 
 ## Prediction intervals
 \fontsize{10}{12}\sf
 
 ```{r brick-fc-interval2, dependson='brick-fc'}
-brick_fc %>% hilo(level=c(50,75)) %>% unpack_hilo(c("50%", "75%"))
+brick_fc |> hilo(level=c(50,75)) |> unpack_hilo(c("50%", "75%"))
 ```
 
 # Lab Session 11
@@ -548,16 +548,16 @@ brick_fc %>% hilo(level=c(50,75)) %>% unpack_hilo(c("50%", "75%"))
 \fontsize{9}{10}\sf
 
 ```{r fbf}
-fb_stock <- gafa_stock %>%
+fb_stock <- gafa_stock |>
   filter(Symbol == "FB")
-fb_stock %>% autoplot(Close)
+fb_stock |> autoplot(Close)
 ```
 
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
 ```{r augment}
-fit <- fb_stock %>% model(NAIVE(Close))
+fit <- fb_stock |> model(NAIVE(Close))
 augment(fit)
 ```
 
@@ -565,7 +565,7 @@ augment(fit)
 \fontsize{10}{10}\sf
 
 ```{r dj4, echo=TRUE, warning=FALSE, fig.height=2.5}
-augment(fit) %>%
+augment(fit) |>
   ggplot(aes(x = trading_day)) +
   geom_line(aes(y = Close, colour = "Data")) +
   geom_line(aes(y = .fitted, colour = "Fitted"))
@@ -575,8 +575,8 @@ augment(fit) %>%
 \fontsize{10}{10}\sf
 
 ```{r dj4a, echo=TRUE, warning=FALSE, fig.height=2.5}
-augment(fit) %>%
-  filter(trading_day > 1100) %>%
+augment(fit) |>
+  filter(trading_day > 1100) |>
   ggplot(aes(x = trading_day)) +
   geom_line(aes(y = Close, colour = "Data")) +
   geom_line(aes(y = .fitted, colour = "Fitted"))
@@ -586,7 +586,7 @@ augment(fit) %>%
 \fontsize{10}{10}\sf
 
 ```{r dj5, echo=TRUE, warning = FALSE}
-augment(fit) %>%
+augment(fit) |>
   autoplot(.resid) + xlab("Day") + ylab("") +
   ggtitle("Residuals from naïve method")
 ```
@@ -595,7 +595,7 @@ augment(fit) %>%
 \fontsize{11}{11}\sf
 
 ```{r dj6, warning=FALSE, fig.height=2.7}
-augment(fit) %>%
+augment(fit) |>
   ggplot(aes(x = .resid)) +
   geom_histogram(bins = 150) +
   ggtitle("Histogram of residuals")
@@ -605,8 +605,8 @@ augment(fit) %>%
 \fontsize{11}{11}\sf
 
 ```{r dj7}
-augment(fit) %>%
-  ACF(.resid) %>%
+augment(fit) |>
+  ACF(.resid) |>
   autoplot() + ggtitle("ACF of residuals")
 ```
 
@@ -622,7 +622,7 @@ augment(fit) %>%
 \fontsize{11}{11}\sf
 
 ```{r dj8}
-fit %>% gg_tsresiduals()
+fit |> gg_tsresiduals()
 ```
 
 ## Ljung-Box test
@@ -654,8 +654,8 @@ where $h=$ max lag and $T=$ \# observations.}
 \fontsize{11}{11}\sf
 
 ```{r dj9extra, echo=FALSE, fig.height=1.5}
-augment(fit) %>%
-  ACF(.resid, lag_max = 10) %>%
+augment(fit) |>
+  ACF(.resid, lag_max = 10) |>
   autoplot() + ggtitle("ACF of residuals")
 ```
 
@@ -663,7 +663,7 @@ augment(fit) %>%
 
 ```{r dj9, echo=TRUE}
 # lag=h and dof=K
-augment(fit) %>% features(.resid, ljung_box, dof = 0, lag = 10)
+augment(fit) |> features(.resid, ljung_box, dof = 0, lag = 10)
 ```
 
 # Lab Session 12
@@ -705,14 +705,14 @@ where the training data is given by $\{y_1,\dots,y_T\}$
 \fontsize{11}{12}\sf
 
 ```r
-beer_fit <- aus_production %>%
-  filter(between(year(Quarter), 1992, 2007)) %>%
+beer_fit <- aus_production |>
+  filter(between(year(Quarter), 1992, 2007)) |>
   model(
     snaive = SNAIVE(Beer),
     mean = MEAN(Beer)
   )
-beer_fit %>%
-  forecast(h = "3 years") %>%
+beer_fit |>
+  forecast(h = "3 years") |>
   autoplot(aus_production, level = NULL) +
   ggtitle("Forecasts for quarterly beer production") +
   xlab("Year") + ylab("Megalitres") +
@@ -722,14 +722,14 @@ beer_fit %>%
 ## Measures of forecast accuracy
 
 ```{r beer-fc-1, echo=FALSE, fig.height=4}
-beer_fit <- aus_production %>%
-  filter(between(year(Quarter), 1992, 2007)) %>%
+beer_fit <- aus_production |>
+  filter(between(year(Quarter), 1992, 2007)) |>
   model(
     snaive = SNAIVE(Beer),
     mean = MEAN(Beer)
   )
-beer_fit %>%
-  forecast(h = "3 years") %>%
+beer_fit |>
+  forecast(h = "3 years") |>
   autoplot(aus_production, level = NULL) +
   ggtitle("Forecasts for quarterly beer production") +
   xlab("Year") + ylab("Megalitres") +

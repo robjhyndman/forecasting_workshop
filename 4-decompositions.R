@@ -2,59 +2,59 @@ library(fpp3)
 
 elecequip <- as_tsibble(fpp2::elecequip)
 
-dcmp <- elecequip %>%
-  model(STL(value ~ season(window = 7))) %>%
+dcmp <- elecequip |>
+  model(STL(value ~ season(window = 7))) |>
   components()
 dcmp
 
 autoplot(dcmp) + xlab("Year")
 
-dcmp %>% gg_subseries(season_year)
+dcmp |> gg_subseries(season_year)
 
-elecequip %>%
+elecequip |>
   autoplot(value) +
   autolayer(dcmp, trend, col='blue')
 
 
-holidays <- tourism %>%
-  filter(Purpose == "Holiday") %>%
-  group_by(State) %>%
+holidays <- tourism |>
+  filter(Purpose == "Holiday") |>
+  group_by(State) |>
   summarise(Trips = sum(Trips))
 
-holidays %>% autoplot(Trips) +
+holidays |> autoplot(Trips) +
   ylab("thousands of trips") + xlab("Year") +
   ggtitle("Australian domestic holiday nights")
 
-holidays %>%
-  model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) %>%
-  components() %>%
+holidays |>
+  model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) |>
+  components() |>
   autoplot()
 
-holidays %>%
-  model(stl = STL(Trips ~ season(window = 5), robust = TRUE)) %>%
-  components() %>%
+holidays |>
+  model(stl = STL(Trips ~ season(window = 5), robust = TRUE)) |>
+  components() |>
   autoplot()
 
 
-dcmp <- holidays %>% model(stl = STL(Trips)) %>% components()
+dcmp <- holidays |> model(stl = STL(Trips)) |> components()
 dcmp
 
-dcmp %>% gg_subseries(season_year)
+dcmp |> gg_subseries(season_year)
 
 autoplot(dcmp, trend, scale_bars = FALSE) +
   autolayer(holidays, alpha = 0.4)
 
 
-vic_elec %>%
-  model(STL(Demand)) %>%
-  components() %>%
+vic_elec |>
+  model(STL(Demand)) |>
+  components() |>
   autoplot()
 
 
-dcmp <- elecequip %>%
-  model(STL(value ~ season(window = 7))) %>%
+dcmp <- elecequip |>
+  model(STL(value ~ season(window = 7))) |>
   components()
-elecequip %>% autoplot(value, col = "gray") +
+elecequip |> autoplot(value, col = "gray") +
   autolayer(dcmp, season_adjust, col = "blue") +
   xlab("Year") + ylab("New orders index") +
   ggtitle("Electrical equipment manufacturing (Euro area)")
@@ -103,11 +103,11 @@ employed <- tsibble(
     11622, 11593
   ),
   index = Time
-) %>%
+) |>
   mutate(
     Month = month(Time, label = TRUE),
     Year = year(Time)
-  ) %>%
+  ) |>
   select(Time, Month, Year, Employed)
 
 
@@ -116,42 +116,42 @@ employed
 
 
 ## ----abs3, fig.height=4-----------------------------------------------------
-employed %>%
+employed |>
   autoplot(Employed) +
   ggtitle("Total employed") + ylab("Thousands") + xlab("Year")
 
 
 ## ----abs4, fig.height=4-----------------------------------------------------
-employed %>%
-  filter(Year >= 2005) %>%
+employed |>
+  filter(Year >= 2005) |>
   autoplot(Employed) +
   ggtitle("Total employed") + ylab("Thousands") + xlab("Year")
 
-employed %>%
-  filter(Year >= 2005) %>%
+employed |>
+  filter(Year >= 2005) |>
   gg_season(Employed, label = "right") +
   ggtitle("Total employed") + ylab("Thousands")
 
-employed %>%
-  mutate(diff = difference(Employed)) %>%
-  filter(Month == "Sep") %>%
+employed |>
+  mutate(diff = difference(Employed)) |>
+  filter(Month == "Sep") |>
   ggplot(aes(y = diff, x = 1)) +
   geom_boxplot() + coord_flip() +
   ggtitle("Sep - Aug: total employed") +
   xlab("") + ylab("Thousands") +
   scale_x_continuous(breaks = NULL, labels = NULL)
 
-dcmp <- employed %>%
-  filter(Year >= 2005) %>%
+dcmp <- employed |>
+  filter(Year >= 2005) |>
   model(stl = STL(Employed ~ season(window = 11), robust = TRUE))
-components(dcmp) %>% autoplot()
+components(dcmp) |> autoplot()
 
-components(dcmp) %>%
-  filter(year(Time) == 2013) %>%
+components(dcmp) |>
+  filter(year(Time) == 2013) |>
   gg_season(season_year) +
   ggtitle("Seasonal component") +
   guides(colour = "none")
 
-components(dcmp) %>%
-  as_tsibble() %>%
+components(dcmp) |>
+  as_tsibble() |>
   autoplot(season_adjust)

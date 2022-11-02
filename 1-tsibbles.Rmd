@@ -16,9 +16,9 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-global_economy <- global_economy %>%
+global_economy <- global_economy |>
   select(Year, Country, GDP, Imports, Exports, Population)
-tourism <- tourism %>%
+tourism <- tourism |>
   mutate(
     State = recode(State,
       "Australian Capital Territory" = "ACT",
@@ -183,8 +183,8 @@ For observations more frequent than once per year, we need to use a time class f
 \fontsize{12}{13}\sf
 
 ```{r month-tsibble}
-z %>%
-  mutate(Month = yearmonth(Month)) %>%
+z |>
+  mutate(Month = yearmonth(Month)) |>
   as_tsibble(index = Month)
 ```
 
@@ -202,7 +202,7 @@ tribble(
   "Weekly", "`yearweek()`",
   "Daily", "`as_date()`, `ymd()`",
   "Sub-daily", "`as_datetime()`"
-) %>%
+) |>
   knitr::kable(booktabs = TRUE)
 ```
 
@@ -225,7 +225,7 @@ prison
 \fontsize{10}{11}\sf
 
 ```{r prison3}
-prison <- readr::read_csv("data/prison_population.csv") %>%
+prison <- readr::read_csv("data/prison_population.csv") |>
   mutate(Quarter = yearquarter(date))
 ```
 
@@ -237,8 +237,8 @@ prison
 \fontsize{10}{11}\sf
 
 ```{r prison4}
-prison <- readr::read_csv("data/prison_population.csv") %>%
-  mutate(Quarter = yearquarter(date)) %>%
+prison <- readr::read_csv("data/prison_population.csv") |>
+  mutate(Quarter = yearquarter(date)) |>
   select(-date)
 ```
 
@@ -250,9 +250,9 @@ prison
 \fontsize{10}{11}\sf
 
 ```{r prison5}
-prison <- readr::read_csv("data/prison_population.csv") %>%
-  mutate(Quarter = yearquarter(date)) %>%
-  select(-date) %>%
+prison <- readr::read_csv("data/prison_population.csv") |>
+  mutate(Quarter = yearquarter(date)) |>
+  select(-date) |>
   as_tsibble(
     index = Quarter,
     key = c(state, gender, legal, indigenous)
@@ -299,7 +299,7 @@ We can use the `filter()` function to select rows.
 \fontsize{8}{10}\sf
 
 ```{r pbs2}
-PBS %>%
+PBS |>
   filter(ATC2 == "A10")
 ```
 
@@ -311,8 +311,8 @@ We can use the `select()` function to select columns.
 \fontsize{8}{10}\sf
 
 ```r
-PBS %>%
-  filter(ATC2=="A10") %>%
+PBS |>
+  filter(ATC2=="A10") |>
   select(Cost)
 ```
 
@@ -332,8 +332,8 @@ We can use the `select()` function to select columns.
 \fontsize{8}{10}\sf
 
 ```{r pbs3}
-PBS %>%
-  filter(ATC2 == "A10") %>%
+PBS |>
+  filter(ATC2 == "A10") |>
   select(Month, Concession, Type, Cost)
 ```
 
@@ -345,9 +345,9 @@ We can use the `summarise()` function to summarise over keys.
 \fontsize{8}{10}\sf
 
 ```{r pbs4}
-PBS %>%
-  filter(ATC2 == "A10") %>%
-  select(Month, Concession, Type, Cost) %>%
+PBS |>
+  filter(ATC2 == "A10") |>
+  select(Month, Concession, Type, Cost) |>
   summarise(total_cost = sum(Cost))
 ```
 
@@ -359,10 +359,10 @@ We can use the `mutate()` function to create new variables.
 \fontsize{8}{10}\sf
 
 ```{r pbs5}
-PBS %>%
-  filter(ATC2 == "A10") %>%
-  select(Month, Concession, Type, Cost) %>%
-  summarise(total_cost = sum(Cost)) %>%
+PBS |>
+  filter(ATC2 == "A10") |>
+  select(Month, Concession, Type, Cost) |>
+  summarise(total_cost = sum(Cost)) |>
   mutate(total_cost = total_cost / 1e6)
 ```
 
@@ -374,10 +374,10 @@ We can use the `mutate()` function to create new variables.
 \fontsize{8}{10}\sf
 
 ```{r pbs6}
-PBS %>%
-  filter(ATC2 == "A10") %>%
-  select(Month, Concession, Type, Cost) %>%
-  summarise(total_cost = sum(Cost)) %>%
+PBS |>
+  filter(ATC2 == "A10") |>
+  select(Month, Concession, Type, Cost) |>
+  summarise(total_cost = sum(Cost)) |>
   mutate(total_cost = total_cost / 1e6) -> a10
 ```
 
@@ -404,10 +404,10 @@ options(width = 60)
 \fontsize{10}{11}\sf
 
 ```{r maxtemp, fig.height=2.4}
-maxtemp <- vic_elec %>%
-  index_by(Day = date(Time)) %>%
+maxtemp <- vic_elec |>
+  index_by(Day = date(Time)) |>
   summarise(Temperature = max(Temperature))
-maxtemp %>%
+maxtemp |>
   autoplot(Temperature) +
   xlab("Week") + ylab("Max temperature")
 ```
@@ -421,7 +421,7 @@ maxtemp %>%
 \fontsize{11}{12}\sf
 
 ```{r, echo=TRUE, fig.height=3.1}
-ansett %>%
+ansett |>
   autoplot(Passengers)
 ```
 
@@ -429,8 +429,8 @@ ansett %>%
 \fontsize{11}{12}\sf
 
 ```{r, echo=TRUE, fig.height=3.1}
-ansett %>%
-  filter(Class == "Economy") %>%
+ansett |>
+  filter(Class == "Economy") |>
   autoplot(Passengers)
 ```
 
@@ -438,8 +438,8 @@ ansett %>%
 \fontsize{11}{12}\sf
 
 ```{r, echo=TRUE, fig.height=3.1}
-ansett %>%
-  filter(Airports == "MEL-SYD") %>%
+ansett |>
+  filter(Airports == "MEL-SYD") |>
   autoplot(Passengers)
 ```
 
@@ -447,8 +447,8 @@ ansett %>%
 \fontsize{11}{12}\sf
 
 ```{r, echo=TRUE, fig.height=3.1}
-ansett %>%
-  filter(Airports == "MEL-SYD") %>%
+ansett |>
+  filter(Airports == "MEL-SYD") |>
   autoplot(Passengers)
 ```
 
