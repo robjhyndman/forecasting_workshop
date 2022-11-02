@@ -19,8 +19,6 @@ output:
 source("setup.R")
 melsyd <- tsibbledata::ansett |>
   filter(Airports == "MEL-SYD")
-austa <- as_tsibble(fpp2::austa) |>
-  rename(Year = index, Visitors = value)
 ```
 
 # Exponential smoothing

@@ -18,15 +18,11 @@ output:
 ```{r setup, include=FALSE}
 source("setup.R")
 
-usmelec <- as_tsibble(fpp2::usmelec) |>
-  rename(Month = index, Generation = value)
 h02 <- tsibbledata::PBS |>
   filter(ATC2 == "H02") |>
   summarise(Cost = sum(Cost))
 melsyd <- tsibbledata::ansett |>
   filter(Airports == "MEL-SYD")
-austa <- as_tsibble(fpp2::austa) |>
-  rename(Year = index, Visitors = value)
 ```
 
 # ARIMA models
@@ -261,69 +257,64 @@ For the United States GDP data (from `global_economy`):
 
 # Seasonal ARIMA models
 
-## Electricity production
-\fontsize{11}{13}\sf
 
-```{r, echo=TRUE, fig.height=3}
-usmelec |> autoplot(
-  Generation
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 <- PBS %>%
+  filter(ATC2 == "H02") %>%
+  summarise(Cost = sum(Cost)/1e6)
+```
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 %>% autoplot(
+  Cost
 )
 ```
 
-## Electricity production
-\fontsize{11}{13}\sf
+## Cortecosteroid drug sales
 
-```{r, echo=TRUE, fig.height=3}
-usmelec |> autoplot(
-  log(Generation)
+```{r, echo=TRUE}
+h02 %>% autoplot(
+  log(Cost)
 )
 ```
 
-## Electricity production
-\fontsize{11}{13}\sf
+## Cortecosteroid drug sales
 
-```{r, echo=TRUE, fig.height=3}
-usmelec |> autoplot(
-  log(Generation) |> difference(12)
+```{r, echo=TRUE}
+h02 %>% autoplot(
+  log(Cost) %>% difference(12)
 )
 ```
 
-## Electricity production
-\fontsize{11}{13}\sf
+## Cortecosteroid drug sales
 
-```{r, echo=TRUE, fig.height=3}
-usmelec |> autoplot(
-  log(Generation) |> difference(12) |> difference()
+```{r, echo=TRUE}
+h02 %>% autoplot(
+  log(Cost) %>% difference(12) %>% difference(1)
 )
 ```
 
 ## Example: US electricity production
-\fontsize{11}{11}\sf
+\fontsize{11}{12}\sf
 
-```{r usmelec2, echo=TRUE}
-usmelec |>
-  model(arima = ARIMA(log(Generation))) |>
+```{r h02fit, echo=TRUE, fig.height=2.8}
+h02 |>
+  model(arima = ARIMA(log(Cost))) |>
   report()
 ```
 
 ## Example: US electricity production
 \fontsize{11}{13}\sf
 
-```{r usmelec3, echo=TRUE, fig.height=2.8}
-usmelec |>
-  model(arima = ARIMA(log(Generation))) |>
+```{r h02fcst, echo=TRUE, fig.height=2.8}
+h02 |>
+  model(arima = ARIMA(log(Cost))) |>
   forecast(h = "3 years") |>
-  autoplot(usmelec)
-```
-
-## Example: US electricity production
-\fontsize{11}{13}\sf
-
-```{r usmelec4, echo=TRUE, fig.height=2.8}
-usmelec |>
-  model(arima = ARIMA(log(Generation))) |>
-  forecast(h = "3 years") |>
-  autoplot(filter_index(usmelec, "2005" ~ .))
+  autoplot(h02)
 ```
 
 ## Seasonal ARIMA models
