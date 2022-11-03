@@ -482,3 +482,9 @@ fc |>
 * Which type of model works best?
 * Does the reconciliation improve the forecast accuracy?
 * Why doesn't the reconcililation make any difference to the SNAIVE forecasts?
+
+## Feedback form
+
+\begin{alertblock}{}\LARGE\bfseries\centering
+\href{https://bit.ly/fable2022feedback}{bit.ly/fable2022feedback}
+\end{alertblock}
