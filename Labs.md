@@ -5,8 +5,8 @@ Time Series Analysis and Forecasting using R
 
 by [Rob J Hyndman](https://robjhyndman.com) and [Bahman Rostami-Tabar](http://bahmanrt.com)
 
-:spiral_calendar: 9-10 November 2022
-:alarm_clock:     09:00 - 17:00
+:spiral_calendar: 9-10 November 2022<br>
+:alarm_clock:     09:00 - 17:00<br>
 :hotel:           Room 5.02, Marie Reay Teaching Building, ANU
 
 
