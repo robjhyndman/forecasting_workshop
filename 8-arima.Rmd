@@ -17,12 +17,6 @@ output:
 
 ```{r setup, include=FALSE}
 source("setup.R")
-
-h02 <- tsibbledata::PBS |>
-  filter(ATC2 == "H02") |>
-  summarise(Cost = sum(Cost))
-melsyd <- tsibbledata::ansett |>
-  filter(Airports == "MEL-SYD")
 ```
 
 # ARIMA models
@@ -257,18 +251,37 @@ For the United States GDP data (from `global_economy`):
 
 # Seasonal ARIMA models
 
+## Seasonal ARIMA models
+\fontsize{13}{15}\sf
+
+| ARIMA | $~\underbrace{(p, d, q)}$ | $\underbrace{(P, D, Q)_{m}}$ |
+| ----: | :-----------------------: | :--------------------------: |
+|       | ${\uparrow}$              | ${\uparrow}$                 |
+|       | Non-seasonal part         | Seasonal part of             |
+|       | of the model              | of the model                 |
+
+\vspace*{-0.4cm}
+
+  * $m =$ number of observations per year.
+  * $d$ first differences, $D$ seasonal differences
+  * $p$ AR lags, $q$ MA lags
+  * $P$ seasonal AR lags, $Q$ seasonal MA lags
+
+###
+Seasonal and non-seasonal terms combine multiplicatively
+
 ## Cortecosteroid drug sales
 
 ```{r, echo=TRUE}
-h02 <- PBS %>%
-  filter(ATC2 == "H02") %>%
+h02 <- PBS |>
+  filter(ATC2 == "H02") |>
   summarise(Cost = sum(Cost) / 1e6)
 ```
 
 ## Cortecosteroid drug sales
 
 ```{r, echo=TRUE}
-h02 %>% autoplot(
+h02 |> autoplot(
   Cost
 )
 ```
@@ -276,7 +289,7 @@ h02 %>% autoplot(
 ## Cortecosteroid drug sales
 
 ```{r, echo=TRUE}
-h02 %>% autoplot(
+h02 |> autoplot(
   log(Cost)
 )
 ```
@@ -284,16 +297,16 @@ h02 %>% autoplot(
 ## Cortecosteroid drug sales
 
 ```{r, echo=TRUE}
-h02 %>% autoplot(
-  log(Cost) %>% difference(12)
+h02 |> autoplot(
+  log(Cost) |> difference(12)
 )
 ```
 
 ## Cortecosteroid drug sales
 
 ```{r, echo=TRUE}
-h02 %>% autoplot(
-  log(Cost) %>% difference(12) %>% difference(1)
+h02 |> autoplot(
+  log(Cost) |> difference(12) |> difference(1)
 )
 ```
 
@@ -314,70 +327,6 @@ h02 |>
   model(arima = ARIMA(log(Cost))) |>
   forecast(h = "3 years") |>
   autoplot(h02)
-```
-
-## Seasonal ARIMA models
-\fontsize{13}{15}\sf
-
-| ARIMA | $~\underbrace{(p, d, q)}$ | $\underbrace{(P, D, Q)_{m}}$ |
-| ----: | :-----------------------: | :--------------------------: |
-|       | ${\uparrow}$              | ${\uparrow}$                 |
-|       | Non-seasonal part         | Seasonal part of             |
-|       | of the model              | of the model                 |
-
-\vspace*{-0.4cm}
-
-  * $m =$ number of observations per year.
-  * $d$ first differences, $D$ seasonal differences
-  * $p$ AR lags, $q$ MA lags
-  * $P$ seasonal AR lags, $Q$ seasonal MA lags
-
-###
-Seasonal and non-seasonal terms combine multiplicatively
-
-## Common ARIMA models
-
-The US Census Bureau uses the following models most often:\vspace*{0.5cm}
-
-\begin{tabular}{|ll|}
-\hline
-ARIMA(0,1,1)(0,1,1)$_m$& with log transformation\\
-ARIMA(0,1,2)(0,1,1)$_m$& with log transformation\\
-ARIMA(2,1,0)(0,1,1)$_m$& with log transformation\\
-ARIMA(0,2,2)(0,1,1)$_m$& with log transformation\\
-ARIMA(2,1,2)(0,1,1)$_m$& with no transformation\\
-\hline
-\end{tabular}
-
-## Cortecosteroid drug sales
-\fontsize{11}{12}\sf
-
-```{r h02, fig.height=2.3}
-h02 <- PBS |>
-  filter(ATC2 == "H02") |>
-  summarise(Cost = sum(Cost))
-h02 |> autoplot(Cost) +
-  labs(x = "Year", y = "", title = "Cortecosteroid drug scripts")
-```
-
-## Cortecosteroid drug sales
-\fontsize{11}{12}\sf
-
-```{r h02a, fig.height=2.3}
-h02 <- PBS |>
-  filter(ATC2 == "H02") |>
-  summarise(Cost = sum(Cost))
-h02 |> autoplot(log(Cost)) +
-  labs(x = "Year", y = "", title = "Log Cortecosteroid drug scripts")
-```
-
-## Cortecosteroid drug sales
-\fontsize{9}{9}\sf
-
-```{r h02auto, echo=TRUE, fig.height=3.6}
-fit <- h02 |>
-  model(auto = ARIMA(log(Cost)))
-report(fit)
 ```
 
 \vspace*{5cm}

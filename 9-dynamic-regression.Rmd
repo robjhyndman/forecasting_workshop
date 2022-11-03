@@ -200,7 +200,6 @@ forecast(fit, vic_next_day)
 ```
 
 ## Daily electricity demand
-\fontsize{8}{9}\sf
 
 ```{r, echo=TRUE}
 vic_elec_future <- new_data(vic_elec_daily, 14) |>
