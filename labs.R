@@ -204,16 +204,10 @@ tourism |>
 
 # Lab Session 10
 
-## Two series have all zeros, so we will drop these to avoid problems in the later calculations
-PBS_no_zeros <- PBS |>
-  group_by_key() |>
-  filter(!all(Cost == 0)) |>
-  ungroup()
-
 library(broom)
 
 ## Compute features
-PBS_feat <- PBS_no_zeros |>
+PBS_feat <- PBS |>
   features(Cost, feature_set(pkgs = "feasts")) |> 
   na.omit()
 
@@ -239,7 +233,6 @@ PBS |>
   autoplot(Cost) +
   facet_grid(vars(Concession, Type, ATC1, ATC2)) +
   ggtitle("Outlying time series in PC space")
-
 
 # Lab Session 11
 
