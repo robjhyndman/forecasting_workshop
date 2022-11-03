@@ -43,7 +43,6 @@ source("setup.R")
 \end{alertblock}
 \end{textblock}
 
-
 ## Assumptions
 
   * This is not an introduction to R. We assume you are broadly comfortable with R code, the RStudio environment and the tidyverse.
@@ -93,8 +92,6 @@ source("setup.R")
 
 ## Install required packages
 
-
-
 ```r
 install.packages(c(
   "tidyverse",
@@ -103,7 +100,6 @@ install.packages(c(
   "sugrrants"
 ))
 ```
-
 
 ## Approximate outline
 \vspace*{-0.1cm}\centering\fontsize{12}{12}\sf

@@ -1,4 +1,10 @@
-# Time series analysis & forecasting using R
+---
+author:
+- Rob J Hyndman and Bahman Rostami-Tabar
+title: Time series analysis & forecasting using R
+toc-title: Table of contents
+venue: ANU, Canberra
+---
 
 ## Venue
 
@@ -82,31 +88,42 @@ install.packages(c("tidyverse","fpp3","GGally", "sugrrants"))
 
 ## Schedule
 
-| Time          | Activity         |
-| :------------ | :--------------- |
-| 09:00 - 10:30 | Session 1        |
-| 10:30 - 11:00 | *Coffee break*   |
-| 11:00 - 12:30 | Session 2        |
-| 12:30 - 13:30 | *Lunch break*    |
-| 13:30 - 15:00 | Session 3        |
-| 15:00 - 15:30 | *Coffee break*   |
-| 15:30 - 17:00 | Session 4        |
+  Time            Activity
+  --------------- ----------------
+  09:00 - 10:30   Session 1
+  10:30 - 11:00   *Coffee break*
+  11:00 - 12:30   Session 2
+  12:30 - 13:30   *Lunch break*
+  13:30 - 15:00   Session 3
+  15:00 - 15:30   *Coffee break*
+  15:30 - 17:00   Session 4
 
 ## Slides
 
 ### Day 1
 
-  0. [Background](https://github.com/robjhyndman/forecasting_workshop/raw/main/0-intro.pdf)
-  1. [Introduction to tsibbles](https://github.com/robjhyndman/forecasting_workshop/raw/main/1-tsibbles.pdf)
-  2. [Time series graphics](https://github.com/robjhyndman/forecasting_workshop/raw/main/2-graphics.pdf)
-  3. [Transformations](https://github.com/robjhyndman/forecasting_workshop/raw/main/3-transformations.pdf)
-  4. [Seasonality and trends](https://github.com/robjhyndman/forecasting_workshop/raw/main/4-decompositions.pdf)
-  5. [Time series features](https://github.com/robjhyndman/forecasting_workshop/raw/main/5-feasts.pdf)
+0.  [Background](https://github.com/robjhyndman/forecasting_workshop/raw/main/0-intro.pdf)
+1.  [Introduction to
+    tsibbles](https://github.com/robjhyndman/forecasting_workshop/raw/main/1-tsibbles.pdf)
+2.  [Time series
+    graphics](https://github.com/robjhyndman/forecasting_workshop/raw/main/2-graphics.pdf)
+3.  [Transformations](https://github.com/robjhyndman/forecasting_workshop/raw/main/3-transformations.pdf)
+4.  [Seasonality and
+    trends](https://github.com/robjhyndman/forecasting_workshop/raw/main/4-decompositions.pdf)
+5.  [Time series
+    features](https://github.com/robjhyndman/forecasting_workshop/raw/main/5-feasts.pdf)
 
 ### Day 2
 
-  6. [Introduction to forecasting](https://github.com/robjhyndman/forecasting_workshop/raw/main/6-fable.pdf)
-  7. [Exponential smoothing](https://github.com/robjhyndman/forecasting_workshop/raw/main/7-ets.pdf)
-  8. [ARIMA models](https://github.com/robjhyndman/forecasting_workshop/raw/main/8-arima.pdf)
-  9. [Dynamic regression](https://github.com/robjhyndman/forecasting_workshop/raw/main/9-dynamic-regression.pdf)
-  10. [Hierarchical forecasting](https://github.com/robjhyndman/forecasting_workshop/raw/main/10-reconciliation.pdf)
+6.  [Introduction to
+    forecasting](https://github.com/robjhyndman/forecasting_workshop/raw/main/6-fable.pdf)
+7.  [Exponential
+    smoothing](https://github.com/robjhyndman/forecasting_workshop/raw/main/7-ets.pdf)
+8.  [ARIMA
+    models](https://github.com/robjhyndman/forecasting_workshop/raw/main/8-arima.pdf)
+9.  [Dynamic
+    regression](https://github.com/robjhyndman/forecasting_workshop/raw/main/9-dynamic-regression.pdf)
+10. [Hierarchical
+    forecasting](https://github.com/robjhyndman/forecasting_workshop/raw/main/10-reconciliation.pdf)
+
+## [Labs](https://github.com/robjhyndman/forecasting_workshop/blob/main/Labs.md)

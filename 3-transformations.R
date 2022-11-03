@@ -25,8 +25,7 @@ print_retail |>
   ggplot(aes(x = Year, y = Turnover)) +
   geom_line() +
   facet_grid(vars(Type), scales = "free_y") +
-  xlab("Years") + ylab(NULL) +
-  ggtitle("Turnover: Australian print media industry")
+  labs(x = "Years", y = NULL, title = "Turnover: Australian print media industry")
 
 food <- aus_retail |>
   filter(Industry == "Food retailing") |>

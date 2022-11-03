@@ -115,26 +115,23 @@ holidays
 
 ```{r holidays-plot, echo=TRUE, dependson="holidays", fig.height=3.1}
 holidays |> autoplot(Trips) +
-  ylab("thousands of trips") + xlab("Year") +
-  ggtitle("Australian domestic holiday nights")
+  labs(y = "thousands of trips", title = "Australian domestic holiday nights")
 ```
 
 ## Seasonal plots
 \fontsize{9}{10}\sf
 
-```{r graphics1, fig.width=6, fig.height=6, out.width="35%"}
+```{r graphics1, fig.width=6, fig.height=6, out.width="42%"}
 holidays |> gg_season(Trips) +
-  ylab("thousands of trips") +
-  ggtitle("Australian domestic holiday nights")
+  labs(y = "thousands of trips", title = "Australian domestic holiday nights")
 ```
 
 ## Seasonal subseries plots
 \fontsize{9}{10}\sf
 
-```{r graphics2, fig.height=4, fig.width=10}
-holidays |>
-  gg_subseries(Trips) + ylab("thousands of trips") +
-  ggtitle("Australian domestic holiday nights")
+```{r graphics2, fig.height=5.5, fig.width=12.5, out.height="73%"}
+holidays |> gg_subseries(Trips) +
+  labs(y = "thousands of trips", title = "Australian domestic holiday nights")
 ```
 
 ## Calendar plots
@@ -162,7 +159,6 @@ prettify(p1,
 \fontsize{10}{11}\sf
 
 ```{r sugrrants2, ref.label="sugrrants", echo=FALSE, out.height="90%", fig.height=5.4, fig.width=9}
-
 ```
 
 # Lab Session 3
@@ -207,8 +203,8 @@ Cyclic
 ```{r, fig.height=2.7}
 aus_production |>
   filter(year(Quarter) >= 1980) |>
-  autoplot(Electricity) + ylab("GWh") +
-  ggtitle("Australian electricity production")
+  autoplot(Electricity) +
+  labs(y = "GWh", title = "Australian electricity production")
 ```
 
 ## Time series patterns
@@ -217,8 +213,8 @@ aus_production |>
 ```{r, warning=FALSE, fig.height=2.7}
 aus_production |>
   autoplot(Bricks) +
-  ggtitle("Australian clay brick production") +
-  xlab("Year") + ylab("million units")
+  labs(title = "Australian clay brick production",
+       x = "Year", y = "million units")
 ```
 
 ## Time series patterns
@@ -228,7 +224,7 @@ aus_production |>
 us_employment |>
   filter(Title == "Retail Trade", year(Month) >= 1980) |>
   autoplot(Employed / 1e3) +
-  ggtitle("Retail employment, USA") + ylab("Million people")
+  labs(title = "Retail employment, USA", y = "Million people")
 ```
 
 ## Time series patterns
@@ -238,8 +234,7 @@ us_employment |>
 gafa_stock |>
   filter(Symbol == "AMZN", year(Date) >= 2018) |>
   autoplot(Close) +
-  ggtitle("Amazon closing stock price") +
-  xlab("Day") + ylab("$")
+  labs(title = "Amazon closing stock price", x = "Day", y = "$")
 ```
 
 ## Time series patterns
@@ -248,8 +243,8 @@ gafa_stock |>
 ```{r, fig.height=2.7}
 pelt |>
   autoplot(Lynx) +
-  ggtitle("Annual Canadian Lynx Trappings") +
-  xlab("Year") + ylab("Number trapped")
+  labs(title = "Annual Canadian Lynx Trappings",
+       x = "Year", y = "Number trapped")
 ```
 
 ## Seasonal or cyclic?
@@ -392,7 +387,6 @@ google_2015
 google_2015 |> autoplot(Close)
 ```
 
-
 ## Google stock price
 
 ```{r}
@@ -409,23 +403,23 @@ We have introduced the following functions: `gg_lag` and `ACF`. Use these functi
 
 ## Which is which?
 
-```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="15.5cm"}
+```{r, fig.height=6, fig.width=12, echo=FALSE, warning=FALSE, out.width="100%"}
 cowtemp <- as_tsibble(fma::cowtemp)
 USAccDeaths <- as_tsibble(USAccDeaths)
 AirPassengers <- as_tsibble(AirPassengers)
 mink <- as_tsibble(fma::mink)
-tp1 <- autoplot(cowtemp, value) + xlab("") + ylab("chirps per minute") +
-  ggtitle("1. Daily temperature of cow")
-tp2 <- autoplot(USAccDeaths, value) + xlab("") + ylab("thousands") +
-  ggtitle("2. Monthly accidental deaths")
-tp3 <- autoplot(AirPassengers, value) + xlab("") + ylab("thousands") +
-  ggtitle("3. Monthly air passengers")
-tp4 <- autoplot(mink, value) + xlab("") + ylab("thousands") +
-  ggtitle("4. Annual mink trappings")
-acfb <- ACF(cowtemp, value) |> autoplot() + xlab("") + ggtitle("B") + ylim(-0.5, 1)
-acfa <- ACF(USAccDeaths, value) |> autoplot() + xlab("") + ggtitle("A") + ylim(-0.5, 1)
-acfd <- ACF(AirPassengers, value) |> autoplot() + xlab("") + ggtitle("D") + ylim(-0.5, 1)
-acfc <- ACF(mink, value) |> autoplot() + xlab("") + ggtitle("C") + ylim(-0.5, 1)
+tp1 <- autoplot(cowtemp, value) + labs(x = "") + labs(y = "chirps per minute") +
+  labs(title = "1. Daily temperature of cow")
+tp2 <- autoplot(USAccDeaths, value) + labs(x = "") + labs(y = "thousands") +
+  labs(title = "2. Monthly accidental deaths")
+tp3 <- autoplot(AirPassengers, value) + labs(x = "") + labs(y = "thousands") +
+  labs(title = "3. Monthly air passengers")
+tp4 <- autoplot(mink, value) + labs(x = "") + labs(y = "thousands") +
+  labs(title = "4. Annual mink trappings")
+acfb <- ACF(cowtemp, value) |> autoplot() + labs(x = "") + labs(title = "B") + ylim(-0.5, 1)
+acfa <- ACF(USAccDeaths, value) |> autoplot() + labs(x = "") + labs(title = "A") + ylim(-0.5, 1)
+acfd <- ACF(AirPassengers, value) |> autoplot() + labs(x = "") + labs(title = "D") + ylim(-0.5, 1)
+acfc <- ACF(mink, value) |> autoplot() + labs(x = "") + labs(title = "C") + ylim(-0.5, 1)
 gridExtra::grid.arrange(tp1, tp2, tp3, tp4,
   acfa, acfb, acfc, acfd,
   nrow = 2
@@ -498,11 +492,10 @@ wn |>
 
 ```{r, fig.height=2.5}
 pigs <- aus_livestock |>
-  filter(State == "Victoria", Animal == "Pigs",
-         year(Month) >= 2014)
+  filter(State == "Victoria", Animal == "Pigs", year(Month) >= 2014)
 pigs |> autoplot(Count / 1e3) +
-  xlab("Year") + ylab("Thousands") +
-  ggtitle("Number of pigs slaughtered in Victoria")
+  labs(x = "Year", y = "Thousands",
+       title = "Number of pigs slaughtered in Victoria")
 ```
 
 ## Example: Pigs slaughtered

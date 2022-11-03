@@ -24,47 +24,57 @@ holidays
 
 holidays |>
   autoplot(Trips) +
-    ylab("thousands of trips") + xlab("Year") +
-    ggtitle("Australian domestic holiday nights")
-
+  labs(
+    x = "Year", y = "thousands of trips",
+    title = "Australian domestic holiday nights"
+  )
 
 ## ----graphics1, fig.width=4, fig.height=5, out.width="45%"------------------
 holidays |>
   gg_season(Trips) +
-    ylab("thousands of trips") +
-    ggtitle("Australian domestic holiday nights")
+  labs(
+    y = "thousands of trips",
+    title = "Australian domestic holiday nights"
+  )
 
 holidays |>
   gg_subseries(Trips) +
-    ylab("thousands of trips") +
-    ggtitle("Australian domestic holiday nights")
+  labs(
+    y = "thousands of trips",
+    title = "Australian domestic holiday nights"
+  )
 
 aus_production |>
   filter(year(Quarter) >= 1980) |>
-  autoplot(Electricity) + ylab("GWh") +
-  ggtitle("Australian electricity production")
+  autoplot(Electricity) +
+  labs(y = "GWh", title = "Australian electricity production")
 
 aus_production |>
   autoplot(Bricks) +
-  ggtitle("Australian clay brick production") +
-  xlab("Year") + ylab("million units")
+  labs(
+    title = "Australian clay brick production",
+    x = "Year", y = "million units"
+  )
 
 us_employment |>
   filter(Title == "Retail Trade", year(Month) >= 1980) |>
   autoplot(Employed / 1e3) +
-  ggtitle("Retail employment, USA") + ylab("Million people")
+  labs(title = "Retail employment, USA", y = "Million people")
 
 gafa_stock |>
   filter(Symbol == "AMZN", year(Date) >= 2018) |>
   autoplot(Close) +
-  ggtitle("Amazon closing stock price") +
-  xlab("Day") + ylab("$")
+  labs(
+    title = "Amazon closing stock price",
+    x = "Day", y = "$"
+  )
 
 pelt |>
   autoplot(Lynx) +
-  ggtitle("Annual Canadian Lynx Trappings") +
-  xlab("Year") + ylab("Number trapped")
-
+  labs(
+    title = "Annual Canadian Lynx Trappings",
+    x = "Year", y = "Number trapped"
+  )
 
 library(sugrrants)
 vic_elec |>
@@ -77,10 +87,9 @@ vic_elec |>
   ggplot(aes(x = .Hour, y = .Demand, group = Date)) +
   geom_line() -> p1
 prettify(p1,
-         size = 3,
-         label.padding = unit(0.15, "lines")
+  size = 3,
+  label.padding = unit(0.15, "lines")
 )
-
 
 new_production <- aus_production |>
   filter(year(Quarter) >= 1992)
@@ -123,13 +132,16 @@ google_2015 |>
   ACF(Close, lag_max = 100) |>
   autoplot()
 
-
 pigs <- aus_livestock |>
-  filter(State == "Victoria", Animal == "Pigs",
-         year(Month) >= 2014)
+  filter(
+    State == "Victoria", Animal == "Pigs",
+    year(Month) >= 2014
+  )
 pigs |> autoplot(Count / 1e3) +
-  xlab("Year") + ylab("Thousands") +
-  ggtitle("Number of pigs slaughtered in Victoria")
+  labs(
+    x = "Year", y = "Thousands",
+    title = "Number of pigs slaughtered in Victoria"
+  )
 
 pigs |>
   ACF(Count) |>

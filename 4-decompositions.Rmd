@@ -87,7 +87,7 @@ us_retail_employment
 ```{r dable1}
 us_retail_employment |>
   autoplot(Employed) +
-  labs(y="Persons (thousands)", title="Total employment in US retail")
+  labs(y = "Persons (thousands)", title = "Total employment in US retail")
 ```
 
 \vspace*{10cm}
@@ -122,13 +122,12 @@ components(dcmp) |> autoplot()
 
 ```{r dable4, fig.height=2.7}
 us_retail_employment |>
-  autoplot(Employed, color='gray') +
-  autolayer(components(dcmp), trend, color='#D55E00') +
-  labs(y="Persons (thousands)", title="Total employment in US retail")
+  autoplot(Employed, color = "gray") +
+  autolayer(components(dcmp), trend, color = "#D55E00") +
+  labs(y = "Persons (thousands)", title = "Total employment in US retail")
 ```
 
 \vspace*{10cm}
-
 
 ## US Retail Employment
 
@@ -148,9 +147,9 @@ $$y_t / S_t = T_t \times R_t$$
 
 ```{r usretail-sa, fig.height=2.7}
 us_retail_employment |>
-  autoplot(Employed, color='gray') +
-  autolayer(components(dcmp), season_adjust, color='#0072B2') +
-  labs(y="Persons (thousands)", title="Total employment in US retail")
+  autoplot(Employed, color = "gray") +
+  autolayer(components(dcmp), season_adjust, color = "#0072B2") +
+  labs(y = "Persons (thousands)", title = "Total employment in US retail")
 ```
 
 ## Seasonal adjustment
@@ -162,9 +161,9 @@ us_retail_employment |>
 ## STL decomposition
 
 ```{r stlwindowanim, echo=FALSE, warning=FALSE, message=FALSE, fig.show='animate', interval=1/10,  fig.height=5.35, fig.width=8, aniopts='controls,buttonsize=0.3cm,width=11.5cm', eval=TRUE}
-s_windows <- seq(5,55,by=2)
-stl_defs <- purrr::map(s_windows, function(s_window){
-  STL(Employed ~ season(window=s_window), robust=TRUE)
+s_windows <- seq(5, 55, by = 2)
+stl_defs <- purrr::map(s_windows, function(s_window) {
+  STL(Employed ~ season(window = s_window), robust = TRUE)
 })
 names(stl_defs) <- sprintf("season(window=%02d)", s_windows)
 
@@ -173,13 +172,16 @@ us_retail_employment |>
   components() |>
   as_tibble() |>
   pivot_longer(Employed:remainder,
-               names_to = "component", names_ptypes = list(component = factor(levels = c("Employed", "trend", "season_year", "remainder"))),
-               values_to = "Employed") |>
+    names_to = "component", names_ptypes = list(component = factor(levels = c("Employed", "trend", "season_year", "remainder"))),
+    values_to = "Employed"
+  ) |>
   ggplot(aes(x = Month, y = Employed)) +
   geom_line() +
   facet_grid(rows = vars(component), scales = "free_y") +
-  labs(title = "STL decomposition of US retail employment",
-       subtitle = "{closest_state}") +
+  labs(
+    title = "STL decomposition of US retail employment",
+    subtitle = "{closest_state}"
+  ) +
   transition_states(.model)
 ```
 
@@ -189,8 +191,9 @@ us_retail_employment |>
 
 ```{r echo = TRUE, results = 'hide'}
 us_retail_employment |>
-  model(STL(Employed ~ trend(window=15) + season(window="periodic"),
-            robust = TRUE)) |>
+  model(STL(Employed ~ trend(window = 15) + season(window = "periodic"),
+    robust = TRUE
+  )) |>
   components()
 ```
 
@@ -205,7 +208,8 @@ us_retail_employment |>
 ```{r mstl, fig.width=8.5, fig.height=3.4}
 us_retail_employment |>
   model(STL(Employed)) |>
-  components() |> autoplot()
+  components() |>
+  autoplot()
 ```
 
 \only<2>{\begin{textblock}{7}(8,0.2)\fontsize{11}{11}\sf
@@ -218,17 +222,17 @@ us_retail_employment |>
 \end{textblock}}
 
 ## STL decomposition
-\fontsize{13}{14.5}\sf
+\fontsize{13}{15}\sf
 
 * Algorithm that updates trend and seasonal components iteratively.
 * Starts with $\hat{T}_t=0$
 * Uses a mixture of loess and moving averages to successively refine the trend and seasonal estimates.
-* The trend window controls loess bandwidth applied to deasonalised values.
-* The season window controls loess bandwidth applied to detrended subseries.
+* trend window controls loess bandwidth on deasonalised values.
+* season window controls loess bandwidth on detrended subseries.
 * Robustness weights based on remainder.
-* Default season `window = 13`
-* Default trend `window = nextodd(` \newline\mbox{}\hfill `ceiling((1.5*period)/(1-(1.5/s.window)))`
-
+* Default season: `window = 13`
+* Default trend:\newline\mbox{}\hfill `window = nextodd(ceiling((1.5*period)/(1-(1.5/s.window)))`
+* `window` values should be odd numbers for symmetry.
 
 ## Australian holidays
 
@@ -241,68 +245,26 @@ holidays <- tourism |>
 
 ```{r holidays-plot2, echo=TRUE, dependson="holidays", fig.height=2.8}
 holidays |> autoplot(Trips) +
-  ylab("thousands of trips") + xlab("Year") +
-  ggtitle("Australian domestic holiday nights")
+  labs(y = "thousands of trips", x = "Year",
+       title = "Australian domestic holiday nights")
 ```
 
-## Decomposition plot
+## Australian holidays
 
 ```{r stlagain2, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
 holidays |>
-  model(stl = STL(Trips ~ season(window = 7))) |>
+  model(stl = STL(Trips)) |>
   components() |>
   autoplot()
 ```
-
-## Decomposition plot
-
-```{r stlagain3, echo=TRUE, warning=FALSE, fig.width=8, fig.height=3}
-holidays |>
-  model(stl = STL(Trips ~ season(window = "periodic"), robust = TRUE)) |>
-  components() |>
-  autoplot()
-```
-
-
-## Decomposition subseries
-
-```{r elecequip3}
-dcmp <- holidays |> model(stl = STL(Trips)) |>
-  components()
-dcmp |> gg_subseries(season_year)
-```
-
-## Decomposition trend
-
-\fontsize{10}{13}\sf
-
-```{r elecequip-trend, message=FALSE, warning=FALSE}
-autoplot(dcmp) +
-  autolayer(holidays, Trips, alpha=0.4)
-```
-
-## STL decomposition
-\fontsize{8}{9}\sf
-
-```r
-holidays |>
-  model(stl = STL(Trips ~ trend(window=15) + season(window=13),
-      robust = TRUE))
-```
-
-\fontsize{14}{16}\sf
-
-  *  `trend(window = ?)` controls wiggliness of trend component.
-  *  `season(window = ?)` controls variation on seasonal component.
-  * `STL()` chooses `season(window=13)` by default
-  * A large seasonal window is equivalent to setting `window="periodic"`.
-  * Odd numbers should be used for symmetry.
 
 ## Holidays decomposition
 \fontsize{9}{10}\sf
 
 ```{r holidays2}
-dcmp <- holidays |> model(stl = STL(Trips)) |> components()
+dcmp <- holidays |>
+  model(stl = STL(Trips)) |>
+  components()
 dcmp
 ```
 
@@ -358,7 +320,7 @@ vic_elec |>
 ```
 
 ```{r vic_elec, echo=FALSE}
-png("figs/vic_elec_stl.png", width = 18, height=18, res=300, units="cm", type = "cairo-png")
+png("figs/vic_elec_stl.png", width = 18, height = 18, res = 300, units = "cm", type = "cairo-png")
 vic_elec |>
   model(STL(Demand)) |>
   components() |>
@@ -369,7 +331,6 @@ crop::dev.off.crop()
 \placefig{7}{0.2}{width=8.7cm, height=20cm}{vic_elec_stl}
 
 \vspace*{10cm}
-
 
 # The ABS stuff-up
 
@@ -478,7 +439,8 @@ employed |>
   mutate(diff = difference(Employed)) |>
   filter(Month == "Sep") |>
   ggplot(aes(y = diff, x = 1)) +
-  geom_boxplot() + coord_flip() +
+  geom_boxplot() +
+  coord_flip() +
   labs(title = "Sep - Aug: total employed", y = "Thousands") +
   scale_x_continuous(breaks = NULL, labels = NULL)
 ```

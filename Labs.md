@@ -9,7 +9,6 @@ by [Rob J Hyndman](https://robjhyndman.com) and [Bahman Rostami-Tabar](http://ba
 :alarm_clock:     09:00 - 17:00<br>
 :hotel:           Room 5.02, Marie Reay Teaching Building, ANU
 
-
 -----
 
 ## Lab Sessions
@@ -147,7 +146,6 @@ For the Australian tourism data (from `tourism`):
  * Check the forecasts for the "Snowy Mountains" and "Melbourne" regions. Do they look reasonable?
 
 ### Lab Session 18
-
 
 Repeat the daily electricity example, but instead of using a quadratic function of temperature, use a piecewise linear function with the "knot" around 20 degrees Celsius (use predictors `Temperature` & `Temp2`). How can you optimize the choice of knot?
 

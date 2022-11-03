@@ -66,8 +66,8 @@ print_retail |>
   ggplot(aes(x = Year, y = Turnover)) +
   geom_line() +
   facet_grid(vars(Type), scales = "free_y") +
-  xlab("Years") + ylab(NULL) +
-  ggtitle("Turnover: Australian print media industry")
+  labs(x = "Years", y = NULL,
+       title = "Turnover: Australian print media industry")
 ```
 
 ## Inflation adjustments
@@ -89,8 +89,10 @@ print_retail |>
   ggplot(aes(x = Year, y = Turnover)) +
   geom_line() +
   facet_grid(vars(Type), scales = "free_y") +
-  xlab("Years") + ylab(NULL) +
-  ggtitle("Turnover: Australian print media industry")
+  labs(
+    x = "Years", y = NULL,
+    title = "Turnover: Australian print media industry"
+  )
 ```
 
 # Mathematical transformations
@@ -195,7 +197,7 @@ food |>
   geom_line() +
   transition_states(1 - lambda, state_length = 0) +
   view_follow() +
-  ggtitle("Box-Cox transformed food retailing turnover (lambda = {format(1 - as.numeric(closest_state), digits = 2)})")
+  labs(title = "Box-Cox transformed food retailing turnover (lambda = {format(1 - as.numeric(closest_state), digits = 2)})")
 ```
 
 ## Box-Cox transformations

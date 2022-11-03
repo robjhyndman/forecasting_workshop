@@ -1,6 +1,5 @@
 library(fpp3)
 
-
 # Lab Session 1
 
 download.file("http://robjhyndman.com/data/tourism.xlsx", tourism_file <- tempfile())
@@ -23,7 +22,6 @@ state_tourism <- my_tourism |>
   summarise(Trips = sum(Trips)) |>
   ungroup()
 
-
 # Lab Session 2
 
 aus_production |> autoplot(Bricks)
@@ -35,10 +33,11 @@ gafa_stock |>
 
 vic_elec |>
   autoplot(Demand) +
-  labs(y = "Demand (MW)",
-       title = "Half-hourly electricity demand",
-       subtitle = "Victoria, Australia")
-
+  labs(
+    y = "Demand (MW)",
+    title = "Half-hourly electricity demand",
+    subtitle = "Victoria, Australia"
+  )
 
 # Lab Session 3
 
@@ -58,42 +57,49 @@ library(sugrrants)
   geom_line()) |>
   prettify()
 
-
 # Lab Session 4
 
 aus_production |> gg_lag(Bricks)
-aus_production |> ACF(Bricks) |> autoplot()
+aus_production |>
+  ACF(Bricks) |>
+  autoplot()
 
 pelt |> gg_lag(Lynx)
-pelt |> ACF(Lynx) |> autoplot()
+pelt |>
+  ACF(Lynx) |>
+  autoplot()
 
 amzn_stock <- gafa_stock |>
   filter(Symbol == "AMZN") |>
   mutate(trading_day = row_number()) |>
-  update_tsibble(index=trading_day, regular=TRUE)
+  update_tsibble(index = trading_day, regular = TRUE)
 amzn_stock |> gg_lag(Close)
-amzn_stock |> ACF(Close) |> autoplot()
+amzn_stock |>
+  ACF(Close) |>
+  autoplot()
 
 vic_elec |> gg_lag(Demand, period = 1, lags = c(1, 2, 24, 48, 336, 17532))
-vic_elec |> ACF(Demand, lag_max = 336) |> autoplot()
-
+vic_elec |>
+  ACF(Demand, lag_max = 336) |>
+  autoplot()
 
 # Lab Session 5
 
 dgoog <- gafa_stock |>
   filter(Symbol == "GOOG", year(Date) >= 2018) |>
   mutate(trading_day = row_number()) |>
-  update_tsibble(index=trading_day, regular=TRUE) |>
+  update_tsibble(index = trading_day, regular = TRUE) |>
   mutate(diff = difference(Close))
 
 dgoog |> autoplot(diff)
-dgoog |> ACF(diff) |> autoplot()
-
+dgoog |>
+  ACF(diff) |>
+  autoplot()
 
 # Lab Session 6
 
 global_economy |>
-  autoplot(GDP/Population, alpha = 0.3) +
+  autoplot(GDP / Population, alpha = 0.3) +
   guides(colour = FALSE)
 
 avg_gdp_pc <- global_economy |>
@@ -101,9 +107,9 @@ avg_gdp_pc <- global_economy |>
   group_by(Country) |>
   summarise(
     # Average GDP per capita for each country
-    gdp_pc = mean(GDP/Population, na.rm = TRUE),
+    gdp_pc = mean(GDP / Population, na.rm = TRUE),
     # Most recent GDP per capita for each country
-    last = last((GDP/Population)[!is.na(GDP/Population)])
+    last = last((GDP / Population)[!is.na(GDP / Population)])
   )
 top_n(avg_gdp_pc, 5, gdp_pc)
 
@@ -137,7 +143,6 @@ holidays |>
   components() |>
   autoplot()
 
-
 # Lab Session 7
 
 global_economy |>
@@ -159,11 +164,10 @@ aus_production |>
 
 canadian_gas |> autoplot()
 
-
 # Lab Session 8
 
 canadian_gas |>
-  model(STL(Volume ~ season(window=7) + trend(window=11))) |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
   components() |>
   autoplot()
 
@@ -172,16 +176,15 @@ canadian_gas |>
 ## A longer window gives a smoother (slow changing) component
 
 canadian_gas |>
-  model(STL(Volume ~ season(window=7) + trend(window=11))) |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
   components() |>
   gg_season(season_year)
 
-  canadian_gas |>
-    model(STL(Volume ~ season(window=7) + trend(window=11))) |>
-    components() |>
-    select(Month, season_adjust) |>
-    autoplot(season_adjust)
-
+canadian_gas |>
+  model(STL(Volume ~ season(window = 7) + trend(window = 11))) |>
+  components() |>
+  select(Month, season_adjust) |>
+  autoplot(season_adjust)
 
 # Lab Session 9
 
@@ -201,14 +204,13 @@ tourism |>
   features(Trips, feat_stl) |>
   select(State, seasonal_peak_year)
 
-
 # Lab Session 10
 
 library(broom)
 
 ## Compute features
 PBS_feat <- PBS |>
-  features(Cost, feature_set(pkgs = "feasts")) |> 
+  features(Cost, feature_set(pkgs = "feasts")) |>
   na.omit()
 
 ## Compute principal components
@@ -232,7 +234,7 @@ PBS |>
   semi_join(outliers, by = c("Concession", "Type", "ATC1", "ATC2")) |>
   autoplot(Cost) +
   facet_grid(vars(Concession, Type, ATC1, ATC2)) +
-  ggtitle("Outlying time series in PC space")
+  labs(title = "Outlying time series in PC space")
 
 # Lab Session 11
 
@@ -254,7 +256,6 @@ aus_takeaway |>
   forecast(h = "3 years") |>
   autoplot(aus_takeaway)
 
-
 # Lab Session 12
 
 beer_model <- aus_production |>
@@ -268,7 +269,6 @@ beer_model |> gg_tsresiduals()
 
 augment(beer_model) |>
   features(.resid, ljung_box, lag = 8, dof = 0)
-
 
 # Lab Session 13
 
@@ -284,7 +284,7 @@ hh_budget_forecast <- hh_budget_train |>
   forecast(h = "4 years")
 
 hh_budget_forecast |>
-  autoplot(hh_budget, level=NULL)
+  autoplot(hh_budget, level = NULL)
 
 hh_budget_forecast |>
   accuracy(hh_budget) |>
@@ -305,7 +305,6 @@ aus_takeaway_forecast <- aus_takeaway_train |>
 
 aus_takeaway_forecast |>
   accuracy(aus_takeaway)
-
 
 # Lab Session 14
 
@@ -329,7 +328,9 @@ fit <- global_economy |>
 fit
 
 report(fit)
-fit |> select(ets) |> report()
+fit |>
+  select(ets) |>
+  report()
 
 glance(fit)
 tidy(fit)
@@ -338,7 +339,6 @@ coef(fit)
 fit |>
   forecast(h = "20 years") |>
   autoplot(global_economy, level = NULL)
-
 
 # Lab Session 15
 
@@ -362,17 +362,19 @@ fc <- fit |>
   forecast(h = "4 years")
 
 fc |>
-  autoplot(aus_production, level=NULL)
+  autoplot(aus_production, level = NULL)
 
 fc |>
   autoplot(
-    filter(aus_production,
-           Quarter > yearquarter("2000 Q4")),
-           level=NULL)
+    filter(
+      aus_production,
+      Quarter > yearquarter("2000 Q4")
+    ),
+    level = NULL
+  )
 
 fc |>
   accuracy(aus_production)
-
 
 # Lab Session 16
 
@@ -385,25 +387,24 @@ us_gdp_model <- us_gdp |>
   model(
     arima_notransform = ARIMA(GDP),
     arima = ARIMA(log(GDP)),
-    arima1= ARIMA(log(GDP) ~ pdq(d=1)),
+    arima1 = ARIMA(log(GDP) ~ pdq(d = 1)),
   )
 us_gdp_model
 glance(us_gdp_model)
 
 us_gdp_model |>
   forecast(h = "10 years") |>
-  autoplot(us_gdp, level=NULL)
+  autoplot(us_gdp, level = NULL)
 
 us_gdp_model |>
-  select(Country,arima_notransform) |>
+  select(Country, arima_notransform) |>
   forecast(h = "10 years") |>
   autoplot(us_gdp)
-
 
 # Lab Session 17
 
 tourism_models <- tourism |>
-  filter(Purpose=="Holiday") |>
+  filter(Purpose == "Holiday") |>
   model(arima = ARIMA(Trips))
 
 tourism_fc <- forecast(tourism_models)
@@ -417,27 +418,28 @@ tourism_fc |>
   filter(Region == "Melbourne") |>
   autoplot(tourism)
 
-
 # Lab Session 18
 
 vic_elec_daily <- vic_elec |>
   filter(year(Time) == 2014) |>
   index_by(Date = date(Time)) |>
   summarise(
-    Demand = sum(Demand)/1e3,
+    Demand = sum(Demand) / 1e3,
     Temperature = max(Temperature),
-    Holiday = any(Holiday)) |>
+    Holiday = any(Holiday)
+  ) |>
   mutate(
     Day_Type = case_when(
       Holiday ~ "Holiday",
       wday(Date) %in% 2:6 ~ "Weekday",
-      TRUE ~ "Weekend")
+      TRUE ~ "Weekend"
+    )
   )
 
 elec_model <- vic_elec_daily |>
   model(fit = ARIMA(Demand ~ Temperature +
-                      I(pmax(Temperature-22,0)) +
-                      (Day_Type=="Weekday")))
+    I(pmax(Temperature - 22, 0)) +
+    (Day_Type == "Weekday")))
 report(elec_model)
 
 elec_model |> gg_tsresiduals()
@@ -461,32 +463,33 @@ vic_elec_future <- new_data(vic_elec_daily, 14) |>
   )
 
 forecast(elec_model, vic_elec_future) |>
-  autoplot(vic_elec_daily) + ylab("Electricity demand (GW)")
-
+  autoplot(vic_elec_daily) + labs(y = "Electricity demand (GW)")
 
 # Lab Session 19
 
 vic_elec_daily <- vic_elec |>
   index_by(Date = date(Time)) |>
   summarise(
-    Demand = sum(Demand)/1e3,
+    Demand = sum(Demand) / 1e3,
     Temperature = max(Temperature),
-    Holiday = any(Holiday)) |>
+    Holiday = any(Holiday)
+  ) |>
   mutate(
     Day_Type = case_when(
       Holiday ~ "Holiday",
       wday(Date) %in% 2:6 ~ "Weekday",
-      TRUE ~ "Weekend")
+      TRUE ~ "Weekend"
+    )
   )
 
 elec_model <- vic_elec_daily |>
   model(fit = ARIMA(Demand ~
-                      fourier("year", K = 10) +
-                      PDQ(0,0,0) +
-                      Temperature +
-                      lag(Temperature) +
-                      I(pmax(Temperature-20,0)) +
-                      (Day_Type=="Weekday")))
+    fourier("year", K = 10) +
+    PDQ(0, 0, 0) +
+    Temperature +
+    lag(Temperature) +
+    I(pmax(Temperature - 20, 0)) +
+    (Day_Type == "Weekday")))
 report(elec_model)
 
 augment(elec_model) |>
@@ -512,8 +515,7 @@ vic_elec_future <- new_data(vic_elec_daily, 14) |>
 
 forecast(elec_model, vic_elec_future) |>
   autoplot(filter(vic_elec_daily, year(Date) > 2013)) +
-  ylab("Electricity demand (GW)")
-
+  labs(y = "Electricity demand (GW)")
 
 # Lab Session 20
 

@@ -47,12 +47,12 @@ maxtemp <- vic_elec |>
 
 maxtemp |>
   autoplot(Temperature) +
-  xlab("Week") + ylab("Max temperature")
+  labs(x = "Week", y = "Max temperature")
 
 maxtemp |>
   ggplot(aes(x = Day, y = Temperature)) +
   geom_point() +
-  xlab("Week") + ylab("Max temperature")
+  labs(x = "Week", y = "Max temperature")
 
 maxtemp |>
   ggplot(aes(x = Day, y = 1)) +
@@ -61,7 +61,8 @@ maxtemp |>
     low = "navy", mid = "yellow",
     high = "red", midpoint = 28
   ) +
-  ylab("") + scale_y_discrete(expand = c(0, 0))
+  labs(y = "") +
+  scale_y_discrete(expand = c(0, 0))
 
 ansett |>
   autoplot(Passengers)

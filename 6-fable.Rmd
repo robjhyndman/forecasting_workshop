@@ -88,7 +88,7 @@ Something is easier to forecast if:
 
 ```{r austa, echo=FALSE}
 # Grab ABS data
-austa <- readxl::read_excel("data/340101.xlsx", sheet="Data1", skip=9) |>
+austa <- readxl::read_excel("data/340101.xlsx", sheet = "Data1", skip = 9) |>
   rename(date = `Series ID`, value = A85375847A) |>
   select(date, value) |>
   transmute(
@@ -165,13 +165,13 @@ p7 <- p1 +
   geom_line(aes(y = .sim, group = replicate, colour = replicate), alpha = 0.5, col = "gray", data = sim) +
   guides(colour = "none")
 p8 <- p7 + autolayer(fc, level = c(50, 90))
-p9 <- p8 + coord_cartesian(xlim=as.Date(c("2014-01-01","2021-08-01"))) +
+p9 <- p8 + coord_cartesian(xlim = as.Date(c("2014-01-01", "2021-08-01"))) +
   scale_x_date(
     breaks = seq(as.Date("2000-01-01"), by = "2 years", l = 11),
     labels = paste("Jan", seq(2000, 2020, by = 2)),
     minor_breaks = seq(as.Date("2001-01-01"), by = "1 year", l = 25)
   )
-aligned_plots <- align_patches(p1, p2, p3, p4, p5, p6, p7, p8,p9)
+aligned_plots <- align_patches(p1, p2, p3, p4, p5, p6, p7, p8, p9)
 ```
 
 \forecast\pause
@@ -279,7 +279,6 @@ aligned_plots[[9]] +
 \end{alertblock}\end{textblock}
 }
 
-
 ## Statistical forecasting
 
 - Thing to be forecast: $y_{T+h}$.
@@ -297,8 +296,10 @@ aligned_plots[[9]] +
 new_production <- aus_production |>
   filter(year(Quarter) >= 1992)
 new_production |> autoplot(Beer) +
-  xlab("Year") + ylab("megalitres") +
-  ggtitle("Australian quarterly beer production")
+  labs(
+    x = "Year", y = "megalitres",
+    title = "Australian quarterly beer production"
+  )
 ```
 
 \begin{textblock}{7}(0.2,8.7)
@@ -316,8 +317,10 @@ aus_livestock |>
     Animal == "Pigs", State == "Victoria"
   ) |>
   autoplot(Count) +
-  xlab("Year") + ylab("thousands") +
-  ggtitle("Number of pigs slaughtered in Victoria, 1990-1995")
+  labs(
+    x = "Year", y = "thousands",
+    title = "Number of pigs slaughtered in Victoria, 1990-1995"
+  )
 ```
 
 \begin{textblock}{7}(0.2,8.7)
@@ -366,7 +369,7 @@ bricks |>
   geom_line() +
   geom_line(aes(y = average), colour = "blue", linetype = "dashed") +
   geom_line(aes(y = .mean), data = fc, colour = "blue") +
-  ggtitle("Clay brick production in Australia")
+  labs(title = "Clay brick production in Australia")
 ```
 
 ## Some simple forecasting methods
@@ -385,7 +388,7 @@ bricks |>
   forecast(h = "5 years") |>
   autoplot(filter(bricks, year(Quarter) > 1990), level = NULL) +
   geom_point(aes(y = Bricks), data = slice(bricks, n()), colour = "blue") +
-  ggtitle("Clay brick production in Australia")
+  labs(title = "Clay brick production in Australia")
 ```
 
 ## Some simple forecasting methods
@@ -402,7 +405,7 @@ bricks |>
   forecast(h = "5 years") |>
   autoplot(filter(bricks, year(Quarter) > 1990), level = NULL) +
   geom_point(aes(y = Bricks), data = slice(bricks, (n() - 3):n()), colour = "blue") +
-  ggtitle("Clay brick production in Australia")
+  labs(title = "Clay brick production in Australia")
 ```
 
 ## Some simple forecasting methods
@@ -435,7 +438,7 @@ aus_production |>
     data = slice(aus_production, range(cumsum(!is.na(Bricks)))),
     linetype = "dashed", colour = "blue"
   ) +
-  ggtitle("Clay brick production in Australia")
+  labs(title = "Clay brick production in Australia")
 ```
 
 ## Model fitting
@@ -445,7 +448,7 @@ The `model()` function trains models to data.
 \fontsize{10}{11}\sf
 
 ```{r brick-model}
-brick_fit <-  aus_production |>
+brick_fit <- aus_production |>
   filter(!is.na(Bricks)) |>
   model(
     `Seasonal_naïve` = SNAIVE(Bricks),
@@ -487,8 +490,8 @@ A \texttt{fable} is a forecast table with point forecasts and distributions.
 ```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=2.6, dependson='brick-fc'}
 brick_fc |>
   autoplot(aus_production, level = NULL) +
-  ggtitle("Forecasts for quarterly clay brick production") +
-  xlab("Year") + ylab("Millions of bricks") +
+  labs(title = "Forecasts for quarterly clay brick production",
+       x = "Year", y = "Millions of bricks") +
   guides(colour = guide_legend(title = "Forecast"))
 ```
 
@@ -496,14 +499,16 @@ brick_fc |>
 \fontsize{10}{12}\sf
 
 ```{r brick-fc-interval, dependson='brick-fc'}
-brick_fc |> hilo(level=c(50,75))
+brick_fc |> hilo(level = c(50, 75))
 ```
 
 ## Prediction intervals
 \fontsize{10}{12}\sf
 
 ```{r brick-fc-interval2, dependson='brick-fc'}
-brick_fc |> hilo(level=c(50,75)) |> unpack_hilo(c("50%", "75%"))
+brick_fc |>
+  hilo(level = c(50, 75)) |>
+  unpack_hilo(c("50%", "75%"))
 ```
 
 # Lab Session 11
@@ -591,8 +596,8 @@ augment(fit) |>
 
 ```{r dj5, echo=TRUE, warning = FALSE, dependson="augment"}
 augment(fit) |>
-  autoplot(.resid) + xlab("Day") + ylab("") +
-  ggtitle("Residuals from naïve method")
+  autoplot(.resid) +
+  labs(x = "Day", y = "", title = "Residuals from naïve method")
 ```
 
 ## Facebook closing stock price
@@ -602,7 +607,7 @@ augment(fit) |>
 augment(fit) |>
   ggplot(aes(x = .resid)) +
   geom_histogram(bins = 150) +
-  ggtitle("Histogram of residuals")
+  labs(title = "Histogram of residuals")
 ```
 
 ## Facebook closing stock price
@@ -611,7 +616,7 @@ augment(fit) |>
 ```{r dj7, dependson="augment"}
 augment(fit) |>
   ACF(.resid) |>
-  autoplot() + ggtitle("ACF of residuals")
+  autoplot() + labs(title = "ACF of residuals")
 ```
 
 ## ACF of residuals
@@ -660,7 +665,7 @@ where $h=$ max lag and $T=$ \# observations.}
 ```{r dj9extra, echo=FALSE, fig.height=1.5}
 augment(fit) |>
   ACF(.resid, lag_max = 10) |>
-  autoplot() + ggtitle("ACF of residuals")
+  autoplot() + labs(title = "ACF of residuals")
 ```
 
 \vspace*{-0.3cm}
@@ -718,8 +723,8 @@ beer_fit <- aus_production |>
 beer_fit |>
   forecast(h = "3 years") |>
   autoplot(aus_production, level = NULL) +
-  ggtitle("Forecasts for quarterly beer production") +
-  xlab("Year") + ylab("Megalitres") +
+  labs(title ="Forecasts for quarterly beer production",
+       x ="Year", y ="Megalitres") +
   guides(colour = guide_legend(title = "Forecast"))
 ```
 
@@ -735,8 +740,10 @@ beer_fit <- aus_production |>
 beer_fit |>
   forecast(h = "3 years") |>
   autoplot(aus_production, level = NULL) +
-  ggtitle("Forecasts for quarterly beer production") +
-  xlab("Year") + ylab("Megalitres") +
+  labs(
+    title = "Forecasts for quarterly beer production",
+    x = "Year", y = "Megalitres"
+  ) +
   guides(colour = guide_legend(title = "Forecast"))
 ```
 

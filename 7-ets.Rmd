@@ -189,7 +189,7 @@ components(fit) |> autoplot()
 fit |>
   forecast(h = 20) |>
   autoplot(aus_economy) +
-  ylab("Population") + xlab("Year")
+  labs(y = "Population", x = "Year")
 ```
 
 ## ETS(A,Ad,N): Damped trend method
@@ -320,7 +320,8 @@ fit |>
 ```{r ausholidays-components-plot}
 fit |>
   filter(Region == "Snowy Mountains") |>
-  components(fit) |> autoplot()
+  components(fit) |>
+  autoplot()
 ```
 
 ## Example: Australian holiday tourism
@@ -340,7 +341,7 @@ fit |>
   forecast() |>
   filter(Region == "Snowy Mountains") |>
   autoplot(holidays) +
-  xlab("Year") + ylab("Overnight trips (thousands)")
+  labs(x = "Year", y = "Overnight trips (thousands)")
 ```
 
 # ETS taxonomy
@@ -447,7 +448,7 @@ vic_cafe <- tsibbledata::aus_retail |>
          Industry == "Cafes, restaurants and catering services") |>
   select(Month, Turnover)
 vic_cafe |>
-  autoplot(Turnover) + ggtitle("Monthly turnover of Victorian cafes")
+  autoplot(Turnover) + labs(title = "Monthly turnover of Victorian cafes")
 ```
 
 ## Forecasting with transformations
@@ -467,8 +468,9 @@ fit
 ```
 
 ```{r include=FALSE}
-if(!identical(fabletools:::model_sum(fit$ets[[1]]), "ETS(A,A,A)"))
+if (!identical(fabletools:::model_sum(fit$ets[[1]]), "ETS(A,A,A)")) {
   stop("Model not ETS(A,A,A)")
+}
 ```
 
 ```{r}
@@ -508,7 +510,7 @@ vic_cafe |>
   ggplot(aes(x = Month)) +
   geom_line(aes(y = Turnover)) +
   geom_line(aes(y = .sim, colour = as.factor(.rep)), data = sim) +
-  ggtitle("Monthly turnover of Victorian cafes") +
+  labs(title = "Monthly turnover of Victorian cafes") +
   guides(col = FALSE)
 ```
 
@@ -525,5 +527,5 @@ fc
 
 ```{r}
 fc |> autoplot(vic_cafe) +
-  ggtitle("Monthly turnover of Victorian cafes")
+  labs(title = "Monthly turnover of Victorian cafes")
 ```
