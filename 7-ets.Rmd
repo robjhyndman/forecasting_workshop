@@ -149,7 +149,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T + hb_T\\
 \text{Measurement equation}&& y_t &= (\ell_{t-1}+b_{t-1})(1+\varepsilon_t)\\
 \text{State equations}&&       \ell_t&=(\ell_{t-1}+b_{t-1})(1+\alpha \varepsilon_t)\\
-&&      b_t&=b_{t-1}+\beta \varepsilon_t
+&&      b_t&=b_{t-1}+\beta (\ell_{t-1}+b_{t-1})\varepsilon_t
 \end{align*}
 \end{block}
 
