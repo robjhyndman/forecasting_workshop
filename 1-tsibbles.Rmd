@@ -389,7 +389,7 @@ maxtemp <- vic_elec |>
   summarise(Temperature = max(Temperature))
 maxtemp |>
   autoplot(Temperature) +
-  labs(x = "Week", y = "Max temperature")
+  labs(y = "Max temperature")
 ```
 
 ## Ansett airlines
