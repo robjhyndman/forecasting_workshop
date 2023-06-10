@@ -1,7 +1,7 @@
 ---
 title: "Time series analysis & forecasting using R"
-venue: ANU, Canberra
-author: "Rob J Hyndman and Bahman Rostami-Tabar"
+venue: Columbia University, New York City
+author: "Rob J Hyndman and Mitchell O'Hara-Wild"
 format: markdown
 ---
 
@@ -11,13 +11,10 @@ options(digits = 3, width = 75)
 library(tidyverse)
 ```
 
-## Venue
-
-Room 5.02, Marie Reay Teaching Building, The Australian National University in Canberra.
 
 ## Dates
 
-9-10 November 2022
+11-12 July 2023
 
 ## Course description
 

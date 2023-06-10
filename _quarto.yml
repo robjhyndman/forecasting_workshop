@@ -1,0 +1,26 @@
+project:
+  title: "Forecasting workshop"
+  render:
+    - "*.qmd"
+
+pdf-engine: pdflatex
+fig-width: 7.5
+fig-height: 3
+format:
+  beamer:
+    theme: monash
+    aspectratio: 169
+    fontsize: 14pt
+    section-titles: false
+    knitr:
+      opts_chunk:
+        dev: "CairoPDF"
+include-in-header: header.tex
+keep-tex: true
+toc: false
+execute:
+  echo: false
+  message: false
+  warning: false
+  cache: true
+  freeze: true

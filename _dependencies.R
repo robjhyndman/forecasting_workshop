@@ -1,0 +1,11 @@
+# Some library commands to ensure packages end up in renv
+library(codetools)
+library(languageserver)
+library(styler)
+library(Cairo)
+library(ragg)
+library(magick)
+library(markdown)
+library(httpuv)
+library(transformr)
+library(latex2exp)

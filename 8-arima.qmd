@@ -1,0 +1,423 @@
+---
+title: "Time Series Analysis & Forecasting Using R"
+subtitle: "8. ARIMA models"
+---
+
+## Outline
+
+\vspace*{0.4cm}\tableofcontents
+
+```{r setup, include=FALSE}
+source("setup.R")
+```
+
+# ARIMA models
+
+## ARIMA models
+
+\begin{tabular}{rl}
+\textbf{AR}: & autoregressive (lagged observations as inputs)\\
+\textbf{I}: & integrated (differencing to make series stationary)\\
+\textbf{MA}: & moving average (lagged errors as inputs)
+\end{tabular}
+
+\pause
+
+###
+An ARIMA model is rarely interpretable in terms of visible data structures like trend and seasonality. But it can capture a huge range of time series patterns.
+
+## Stationarity
+
+\begin{block}{Definition}
+If $\{y_t\}$ is a stationary time series, then for all $s$, the distribution of $(y_t,\dots,y_{t+s})$ does not depend on $t$.
+\end{block}\pause
+
+A **stationary series** is:
+
+* roughly horizontal
+* constant variance
+* no patterns predictable in the long-term
+
+## Stationary?
+\fontsize{11}{12}\sf
+
+```{r, fig.height=2.7}
+gafa_stock |>
+  filter(Symbol == "GOOG", year(Date) == 2018) |>
+  autoplot(Close) +
+  labs(y = "Google closing stock price ($US)")
+```
+
+## Stationary?
+\fontsize{11}{12}\sf
+
+```{r, fig.height=2.7}
+gafa_stock |>
+  filter(Symbol == "GOOG", year(Date) == 2018) |>
+  autoplot(difference(Close)) +
+  labs(y = "Daily change in Google closing stock price")
+```
+
+## Differencing
+\fontsize{13}{15}\sf
+
+* Differencing helps to **stabilize the mean**.
+* The differenced series is the *change* between each observation in the original series.
+* Occasionally the differenced data will not appear stationary and it may be necessary to difference the data a second time.
+* In practice, it is almost never necessary to go beyond second-order differences.
+
+## Autoregressive models
+
+\begin{block}{Autoregressive (AR) models:}\vspace*{-0.3cm}
+$$
+  y_{t} = c + \phi_{1}y_{t - 1} + \phi_{2}y_{t - 2} + \cdots + \phi_{p}y_{t - p} + \varepsilon_{t},
+$$
+where $\varepsilon_t$ is white noise. A multiple regression with \textbf{lagged values} of $y_t$ as predictors.
+\end{block}
+
+```{r arp, echo=FALSE, fig.height=2.3}
+set.seed(1)
+p1 <- tsibble(idx = seq_len(100), sim = 10 + arima.sim(list(ar = -0.8), n = 100), index = idx) |>
+  autoplot(sim) + labs(x = "time", y = "", title = "AR(1)")
+p2 <- tsibble(idx = seq_len(100), sim = 20 + arima.sim(list(ar = c(1.3, -0.7)), n = 100), index = idx) |>
+  autoplot(sim) + labs(x = "time", y = "", title = "AR(2)")
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+* Cyclic behaviour is possible when $p\ge 2$.
+
+## Moving Average (MA) models
+
+\begin{block}{Moving Average (MA) models:}\vspace*{-0.3cm}
+$$
+  y_{t} = c + \varepsilon_t + \theta_{1}\varepsilon_{t - 1} + \theta_{2}\varepsilon_{t - 2} + \cdots + \theta_{q}\varepsilon_{t - q},
+$$
+where $\varepsilon_t$ is white noise.
+A multiple regression with \textbf{lagged \emph{errors}} as predictors. \emph{Don't confuse with moving average smoothing!}
+\end{block}
+
+```{r maq, fig.height=2.3, echo=FALSE}
+set.seed(2)
+p1 <- tsibble(idx = seq_len(100), sim = 20 + arima.sim(list(ma = 0.8), n = 100), index = idx) |>
+  autoplot(sim) + labs(x = "time", y = "", title = "MA(1)")
+p2 <- tsibble(idx = seq_len(100), sim = arima.sim(list(ma = c(-1, +0.8)), n = 100), index = idx) |>
+  autoplot(sim) + labs(x = "time", y = "", title = "MA(2)")
+
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+## ARIMA models
+
+\begin{block}{Autoregressive Moving Average models:}\vspace*{-0.4cm}
+\begin{align*}
+  y_{t} &= c + \phi_{1}y_{t - 1} + \cdots + \phi_{p}y_{t - p} \\
+        & \hspace*{2.4cm}\text{} + \theta_{1}\varepsilon_{t - 1} + \cdots + \theta_{q}\varepsilon_{t - q} + \varepsilon_{t}.
+\end{align*}
+\end{block}\pause
+
+* Predictors include both **lagged values of $y_t$ and lagged errors.**
+\pause
+
+### Autoregressive Integrated Moving Average models
+* Combine ARMA model with **differencing**.
+* $d$-differenced series follows an ARMA model.
+* Need to choose $p$, $d$, $q$ and whether or not to include $c$.
+
+## ARIMA models
+
+\begin{block}{ARIMA($p, d, q$) model}
+\begin{tabular}{rl}
+AR:& $p =$ order of the autoregressive part\\
+I: & $d =$ degree of first differencing involved\\
+MA:& $q =$ order of the moving average part.
+\end{tabular}
+\end{block}
+
+* White noise model: ARIMA(0,0,0)
+* Random walk: ARIMA(0,1,0) with no constant
+* Random walk with drift: ARIMA(0,1,0) with \rlap{const.}
+* AR($p$): ARIMA($p$,0,0)
+* MA($q$): ARIMA(0,0,$q$)
+
+## Example: National populations
+\fontsize{11}{12}\sf
+
+```{r popfit2, echo=TRUE, cache=TRUE}
+fit <- global_economy |>
+  model(arima = ARIMA(Population))
+fit
+```
+
+## Example: National populations
+\fontsize{11}{12}\sf
+
+```{r popfit3, echo=TRUE, cache=TRUE}
+fit |>
+  filter(Country == "Australia") |>
+  report()
+```
+
+\only<2>{\begin{textblock}{6.4}(6,4.6)
+\begin{alertblock}{}\fontsize{12}{13}\sf
+\centerline{$y_t = 2y_{t-1} - y_{t-2} - 0.7 \varepsilon_{t-1} + \varepsilon_t$}
+\mbox{}\hfill$\varepsilon_t \sim \text{NID}(0,4\times10^9)$
+\end{alertblock}
+\end{textblock}}
+\vspace*{3cm}
+
+## Understanding ARIMA models
+\fontsize{14}{16}\sf
+
+* If $c=0$ and $d=0$, the long-term forecasts will go to zero.
+* If $c=0$ and $d=1$, the long-term forecasts will go to a non-zero constant.
+* If $c=0$ and $d=2$, the long-term forecasts will follow a straight line.
+
+* If $c\ne0$ and $d=0$, the long-term forecasts will go to the mean of the data.
+* If $c\ne0$ and $d=1$, the long-term forecasts will follow a straight line.
+* If $c\ne0$ and $d=2$, the long-term forecasts will follow a quadratic trend.
+
+## Understanding ARIMA models
+\fontsize{14}{15.5}\sf
+
+### Forecast variance and $d$
+  * The higher the value of $d$, the more rapidly the prediction intervals increase in size.
+  * For $d=0$, the long-term forecast standard deviation will go to the standard deviation of the historical data.
+
+## Example: National populations
+\fontsize{9}{9}\sf
+
+```{r popfc2, echo=TRUE, cache=TRUE, fig.height=2.8}
+fit |>
+  forecast(h = 10) |>
+  filter(Country == "Australia") |>
+  autoplot(global_economy)
+```
+
+## How does ARIMA() work?
+
+\begin{alertblock}{Hyndman and Khandakar (JSS, 2008) algorithm:}
+\begin{itemize}\tightlist
+\item Select no.\ differences $d$ via KPSS test.
+\item Select $p$, $q$ and inclusion of $c$ by minimising AICc.
+\item Use stepwise search to traverse model space.
+\end{itemize}
+\end{alertblock}\pause
+
+\begin{block}{}
+$$\text{AICc} = -2 \log(L) + 2(p+q+k+1)\left[1 + \frac{(p+q+k+2)}{T-p-q-k-2}\right].$$
+where $L$ is the maximised likelihood fitted to the \textit{differenced} data,
+$k=1$ if $c\neq 0$ and $k=0$ otherwise.\pause
+\end{block}
+
+Note: Can't compare AICc for different values of $d$.
+
+## How does ARIMA() work?
+\fontsize{12.5}{14.5}\sf
+
+Step1:
+: Select current model (with smallest AICc) from:\newline
+ARIMA$(2,d,2)$\newline
+ARIMA$(0,d,0)$\newline
+ARIMA$(1,d,0)$\newline
+ARIMA$(0,d,1)$
+\pause\vspace*{-0.1cm}
+
+Step 2:
+: Consider variations of current model:
+
+    * vary one of $p,q,$ from current model by $\pm1$;
+    * $p,q$ both vary from current model by $\pm1$;
+    * Include/exclude $c$ from current model.
+
+  Model with lowest AICc becomes current model.
+
+\pause\alert{Repeat Step 2 until no lower AICc can be found.}
+
+# Lab Session 16
+## Lab Session 16
+
+For the United States GDP data (from `global_economy`):
+
+ * Fit a suitable ARIMA model for the logged data.
+ * Produce forecasts of your fitted model. Do the forecasts look reasonable?
+
+# Seasonal ARIMA models
+
+## Seasonal ARIMA models
+\fontsize{13}{15}\sf
+
+| ARIMA | $~\underbrace{(p, d, q)}$ | $\underbrace{(P, D, Q)_{m}}$ |
+| ----: | :-----------------------: | :--------------------------: |
+|       | ${\uparrow}$              | ${\uparrow}$                 |
+|       | Non-seasonal part         | Seasonal part of             |
+|       | of the model              | of the model                 |
+
+\vspace*{-0.4cm}
+
+  * $m =$ number of observations per year.
+  * $d$ first differences, $D$ seasonal differences
+  * $p$ AR lags, $q$ MA lags
+  * $P$ seasonal AR lags, $Q$ seasonal MA lags
+
+###
+Seasonal and non-seasonal terms combine multiplicatively
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 <- PBS |>
+  filter(ATC2 == "H02") |>
+  summarise(Cost = sum(Cost) / 1e6)
+```
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 |> autoplot(
+  Cost
+)
+```
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 |> autoplot(
+  log(Cost)
+)
+```
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 |> autoplot(
+  log(Cost) |> difference(12)
+)
+```
+
+## Cortecosteroid drug sales
+
+```{r, echo=TRUE}
+h02 |> autoplot(
+  log(Cost) |> difference(12) |> difference(1)
+)
+```
+
+## Example: US electricity production
+\fontsize{11}{12}\sf
+
+```{r h02fit, echo=TRUE, fig.height=2.8}
+h02 |>
+  model(arima = ARIMA(log(Cost))) |>
+  report()
+```
+
+## Example: US electricity production
+\fontsize{11}{13}\sf
+
+```{r h02fcst, echo=TRUE, fig.height=2.8}
+h02 |>
+  model(arima = ARIMA(log(Cost))) |>
+  forecast(h = "3 years") |>
+  autoplot(h02)
+```
+
+\vspace*{5cm}
+
+## Cortecosteroid drug sales
+\fontsize{9}{9}\sf
+
+```{r h02tryharder, echo=TRUE, fig.height=3.6}
+fit <- h02 |>
+  model(best = ARIMA(log(Cost),
+    stepwise = FALSE,
+    approximation = FALSE,
+    order_constraint = p + q + P + Q <= 9
+  ))
+report(fit)
+```
+
+## Cortecosteroid drug sales
+\fontsize{11}{14}\sf
+
+```{r h02f, echo=TRUE, fig.height=2.8}
+fit |>
+  forecast() |>
+  autoplot(h02) +
+  labs(y = "H02 Expenditure ($AUD)", x = "Year")
+```
+
+# Lab Session 17
+## Lab Session 17
+
+For the Australian tourism data (from `tourism`):
+
+ * Fit a suitable ARIMA model for all data.
+ * Produce forecasts of your fitted models.
+ * Check the forecasts for the "Snowy Mountains" and "Melbourne" regions. Do they look reasonable?
+
+# Forecast ensembles
+
+## Forecast ensembles
+\fontsize{10}{11}\sf
+
+```{r trainall, echo=TRUE, dependson='tourism'}
+train <- tourism |>
+  filter(year(Quarter) <= 2014)
+fit <- train |>
+  model(
+    ets = ETS(Trips),
+    arima = ARIMA(Trips),
+    snaive = SNAIVE(Trips)
+  ) |>
+  mutate(mixed = (ets + arima + snaive) / 3)
+```
+
+\fontsize{13}{14}\sf
+
+ * Ensemble forecast `mixed` is a simple average of the three fitted models.
+ *  `forecast()` will produce distributional forecasts taking into account the correlations between the forecast errors of the component models.
+
+## Forecast ensembles
+\fontsize{10}{11}\sf
+
+```{r trainfc, dependson='trainall'}
+fc <- fit |> forecast(h = "3 years")
+fc |>
+  filter(Region == "Snowy Mountains", Purpose == "Holiday") |>
+  autoplot(tourism, level = NULL)
+```
+
+## Forecast ensembles
+\fontsize{10}{11}\sf
+
+```{r snowy-test-accuracy, dependson='trainfc'}
+accuracy(fc, tourism) |>
+  group_by(.model) |>
+  summarise(
+    RMSE = mean(RMSE),
+    MAE = mean(MAE),
+    MASE = mean(MASE)
+  ) |>
+  arrange(RMSE)
+```
+
+## Forecast ensembles
+\fontsize{13}{15}\sf
+
+\begin{alertblock}{}\bfseries Can we do better than equal weights?\end{alertblock}\pause\vspace*{-0.3cm}
+
+ * Hard to find weights that improve forecast accuracy.
+ * Known as the "forecast combination puzzle".
+ * Solution:  FFORMA
+
+\pause
+
+\begin{block}{\fontsize{13}{14}\sf\textbf{FFORMA (Feature-based FORecast Model Averaging)}}
+\begin{itemize}
+\item Vector of time series features used to predict best weights.
+\item A modification of xgboost is used.
+\item Method came 2nd in the 2018 M4 international forecasting competition.
+\item Main author: Pablo Montero-Manso (Monash U)
+\item Not (yet) available for fable.
+\end{itemize}
+\end{block}

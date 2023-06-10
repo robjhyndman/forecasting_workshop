@@ -1,0 +1,108 @@
+---
+title: "Tidy Time Series & Forecasting Using R"
+author: "Rob J Hyndman"
+---
+
+```{r setup, include=FALSE}
+source("setup.R")
+```
+
+## Instructors
+
+\placefig{0.6}{1.5}{width=3.5cm}{Rob}
+\begin{textblock}{8.2}(5.6,1.3)
+\begin{alertblock}{Rob J Hyndman}
+\href{https://robjhyndman.com}{\faIcon{home} robjhyndman.com}\\
+\href{https://aus.social/@robjhyndman}{\faIcon{mastodon} @robjhyndman@aus.social}\\
+\href{https://github.com/robjhyndman}{\faIcon{github}  @robjhyndman}\\
+\href{mailto:rob.hyndman@monash.edu}{\faIcon{envelope}  rob.hyndman@monash.edu}
+\end{alertblock}
+\end{textblock}
+
+\placefig{0.6}{5.4}{width=3.5cm}{Mitch}
+\begin{textblock}{8.2}(5.6,5.4)
+\begin{alertblock}{Mitchell O'Hara-Wild}
+\href{https://mitchelloharawild.com}{\faIcon{home} mitchelloharawild.com}\\
+\href{https://github.com/mitchoharawild}{\faIcon{github}  @mitchelloharawild}\\
+\href{mailto:Mitch.OHara-Wild@monash.edu}{\faIcon{envelope}  Mitch.OHara-Wild@monash.edu}
+\end{alertblock}
+\end{textblock}
+
+## Assumptions
+
+  * This is not an introduction to R. We assume you are broadly comfortable with R code, the RStudio environment and the tidyverse.
+  * This is not a statistics course. We assume you are familiar with concepts such as the mean, standard deviation, quantiles, regression, normal distribution, likelihood, etc.
+  * This is not a theory course. We are not going to derive anything. We will teach you time series and forecasting tools, when to use them, and how to use them most effectively.
+
+## Key reference
+
+\large
+
+\begin{block}{}\bf
+\hangafter=1\hangindent=.3cm
+ {Hyndman, R.~J. \& Athanasopoulos, G. (2021) \emph{Forecasting: principles and practice}, 3rd ed.}
+\end{block}\pause
+\begin{alertblock}{}\Large
+\centerline{\bf OTexts.org/fpp3/}
+\end{alertblock}
+
+\pause
+
+  * Free and online
+  * Data sets in associated R package
+  * R code for examples
+
+## Poll: How experienced are you in forecasting
+
+  1. Guru: I wrote the book, done it for decades, now I do the conference circuit.
+  2. Expert: It has been my full time job for more than a decade.
+  3. Skilled: I have been doing it for years.
+  1. Comfortable: I understand it and have done it.
+  1. Learner: I am still learning.
+  1. Beginner: I have heard of it and would like to learn more.
+  1. Unknown: What is forecasting? Is that what the weather people do?
+
+## Poll: How proficient are you in using R?
+
+\fontsize{14}{15}\sf
+
+  1. Guru: The R core team come to me for advice.
+  1. Expert: I have written several packages on CRAN.
+  1. Skilled: I use it regularly and it is an important part of my job.
+  1. Comfortable: I use it often and am comfortable with the tool.
+  1. User: I use it sometimes, but I am often searching around for the right function.
+  1. Learner: I have used it a few times.
+  1. Beginner: I've managed to download and install it.
+  1. Unknown: Why are you speaking like a pirate?
+
+## Install required packages
+
+```r
+install.packages(c(
+  "tidyverse",
+  "fpp3",
+  "GGally"
+))
+```
+
+## Approximate outline
+\vspace*{-0.1cm}\centering\fontsize{12}{12}\sf
+\begin{tabular}{rp{6.6cm}l}
+  \bf Day & \bf Topic                   & \bf Chapter \\
+  \midrule
+  1       & 1. Introduction to tsibbles    & 2 \\
+  1       & 2. Time series graphics        & 2 \\
+  1       & 3. Transformations             & 3 \\
+  1       & 4. Seasonality and trends      & 7 \\
+  1       & 5. Time series features        & -- \\
+  \midrule
+  2       & 6. Introduction to forecasting & 1,3 \\
+  2       & 7. Exponential smoothing       & 8 \\
+  2       & 8. ARIMA models                & 9 \\
+  2       & 9. Dynamic regression          & 10 \\
+  2      & 10. Hierarchical forecasting    & 11 \\
+  \bottomrule
+\end{tabular}
+
+\vspace*{.0cm}\begin{alertblock}{}{\centerline{\Large\textbf{bit.ly/fable2023}}}
+\end{alertblock}

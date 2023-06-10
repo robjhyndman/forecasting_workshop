@@ -1,12 +1,14 @@
-% Packages
-\usepackage{fontspec,sourcesanspro}
+% Colors
+\definecolor{shadecolor}{RGB}{225,225,225}
+\setbeamercolor{description item}{fg=Orange}
+\definecolor{MonashBlue}{RGB}{66,109,152}
+\definecolor{burntorange}{rgb}{0.8, 0.33, 0.0}
 
-\setmonofont{Hack FC Ligatured-Regular}[
-Scale=0.85,Contextuals=Alternate % Activate the calt feature
-]
-\usepackage{bm,booktabs,tabularx}
-\usepackage{animate,soul}
-%\DeclareUnicodeCharacter{03BC}{$\mu$}
+% Packages
+\usepackage{amsmath, bm, amssymb, amsthm, mathrsfs,pifont}
+\usepackage{url}
+\usepackage{multirow, booktabs, float, textcmds, siunitx}
+\usepackage{bm,booktabs,animate,ragged2e,multicol,microtype,hyperref}
 \usepackage{fontawesome5}
 
 % Figures
@@ -14,31 +16,11 @@ Scale=0.85,Contextuals=Alternate % Activate the calt feature
 
 % Fonts
 \fontsize{13}{15}\sf
-%\usepackage[scale=0.85]{sourcecodepro}
-%\DisableLigatures{encoding = T1, family = tt*}
 \setbeamerfont{title}{series=\bfseries,parent=structure,size=\fontsize{24}{24}}
 \ifcsname Shaded\endcsname
   \definecolor{shadecolor}{RGB}{225,225,225}
   \renewenvironment{Shaded}{\color{black}\fontsize{10}{10}\sf\begin{snugshade}\color{black}}{\end{snugshade}}
 \fi
-
-% Colors
-\setbeamercolor{description item}{fg=Orange}
-\definecolor{MonashBlue}{RGB}{66,109,152}
-\definecolor{burntorange}{rgb}{0.8, 0.33, 0.0}
-
-% tikz diagrams
-\usepackage{tikz}
-\usetikzlibrary{trees,shapes,arrows,matrix}
-\tikzstyle{decision} = [diamond, draw, fill=blue!20,
-    text width=4.5em, text badly centered, node distance=4cm, inner sep=0pt]
-\tikzstyle{block} = [rectangle, draw, fill=blue!20,
-    text width=5cm, text centered, rounded corners, minimum height=4em]
-\tikzstyle{line} = [draw, thick, -latex']
-%\tikzstyle{line} = [->,thi
-\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
-    minimum height=2em, text centered]
-\tikzstyle{connector} = [->,thick]
 
 % gt dependencies
 \usepackage{longtable,caption,setspace}
@@ -77,23 +59,75 @@ Scale=0.85,Contextuals=Alternate % Activate the calt feature
 \begin{block}{}\fontsize{10}{11}\sf
 Simulated futures from an ETS model
 \end{block}\end{textblock}}
-
 \def\fullwidth#1{\centerline{\includegraphics[height=27.1cm,width=16cm,keepaspectratio=true]{#1}}}
 \def\fullheight#1{\centerline{\includegraphics[height=7.65cm,width=25cm,keepaspectratio=true]{#1}}}
 \def\full#1{\centerline{\includegraphics[height=7.7cm,width=15cm,keepaspectratio=true]{#1}}}
 
 \setbeamertemplate{title page}
-{\placefig{-0.01}{-0.01}{width=1.01\paperwidth,height=1.01\paperheight}{Canberra16x9.jpg}
-\begin{textblock}{8.3}(.7,.5)\fontsize{24}{24}\sf
-  {\raggedright\color{Orange}\usebeamerfont{title}\par Time Series Analysis \& Forecasting Using R}
-\end{textblock}
+{\placefig{-0.01}{-0.01}{width=1.01\paperwidth,height=1.01\paperheight}{NYC.jpg}
+\begin{textblock}{8.5}(.5,0.2)
+  \raggedright\fontsize{20}{20}\selectfont\bfseries\sffamily\textcolor{Orange}{\inserttitle}\\[0.2cm]
+  \fontsize{12}{12}\selectfont\bfseries\sffamily\textcolor{Orange}{\insertsubtitle}
+  \end{textblock}
 \placefig{.5}{6.2}{width=2.4cm}{tsibble.png}
 \placefig{2.9}{6.2}{width=2.4cm}{feasts.png}
 \placefig{5.3}{6.2}{width=2.4cm}{fable.png}
-\begin{textblock}{7.5}(8.2,1.)
-  \rightline{\fontsize{13}{13}\sf\color{Orange}\insertauthor}
-\end{textblock}
-\begin{textblock}{7.5}(13.6,.1)
-  {\fontsize{9}{9}\sf\color{Orange}bit.ly/fable2022}
+\begin{textblock}{7.5}(13.6,-.1)
+  {\fontsize{9}{9}\sf\color{Orange}bit.ly/fable2023}
 \end{textblock}
 }
+
+% Tikz plots
+\usepackage{tikz}
+\usetikzlibrary{trees,shapes,arrows,matrix,shadows,positioning,calc}
+\tikzstyle{decision} = [diamond, draw, fill=blue!20,
+    text width=4.5em, text badly centered, node distance=4cm, inner sep=0pt]
+\tikzstyle{block} = [rectangle, draw, fill=blue!20,
+    text width=5cm, text centered, rounded corners, minimum height=4em]
+\tikzstyle{line} = [draw, thick, -latex']
+\tikzstyle{cloud} = [draw, ellipse,fill=red!20, node distance=3cm,
+    minimum height=2em, text centered]
+\tikzstyle{connector} = [->,thick]
+
+\tikzset{
+  basic/.style  = {draw, text width=2cm, font=\sffamily, rectangle},
+  root/.style   = {basic, text width=3cm, rounded corners=2pt, thin, align=center, fill=red!30},
+  level 2a/.style = {basic, rounded corners=2pt, thin,align=center, fill=blue!50, text width=7em},
+  level 2b/.style = {basic, rounded corners=2pt, thin,align=center, fill=green!50, text width=7em},
+  level 3a/.style = {basic, rounded corners=2pt, thin, align=center, fill=blue!30, text width=4em},
+  level 3b/.style = {basic, rounded corners=2pt, thin, align=center, fill=green!30, text width=4em},
+  level 4a/.style = {basic, rounded corners=2pt, thin, align=left, fill=blue!10, text width=3.5em},
+  level 4b/.style = {basic, rounded corners=2pt, thin, align=left, fill=green!10, text width=3.5em}
+}
+
+% BIBLIOGRAPHIES
+\usepackage[style=authoryear,bibencoding=utf8,minnames=1,maxnames=4, maxbibnames=99,natbib=true,dashed=false,terseinits=true,giveninits=true,uniquename=false,uniquelist=false,labeldate=true,doi=false, isbn=false, natbib=true,backend=biber]{biblatex}
+
+\DeclareFieldFormat{url}{\url{#1}}
+\DeclareFieldFormat[article]{pages}{#1}
+\DeclareFieldFormat[inproceedings]{pages}{\lowercase{pp.}#1}
+\DeclareFieldFormat[incollection]{pages}{\lowercase{pp.}#1}
+\DeclareFieldFormat[article]{volume}{\mkbibbold{#1}}
+\DeclareFieldFormat[article]{number}{\mkbibparens{#1}}
+\DeclareFieldFormat[article]{title}{\MakeCapital{#1}}
+\DeclareFieldFormat[article]{url}{}
+\DeclareFieldFormat[Techreport]{Url}{}
+\DeclareFieldFormat[book]{url}{}
+\DeclareFieldFormat[inbook]{url}{}
+\DeclareFieldFormat[incollection]{url}{}
+\DeclareFieldFormat[inproceedings]{url}{}
+\DeclareFieldFormat[inproceedings]{title}{#1}
+\DeclareFieldFormat{shorthandwidth}{#1}
+%\DeclareFieldFormat{extrayear}{}
+% No dot before number of articles
+\usepackage{xpatch}
+\xpatchbibmacro{volume+number+eid}{\setunit*{\adddot}}{}{}{}
+% Remove In: for an article.
+\renewbibmacro{in:}{%
+  \ifentrytype{article}{}{%
+  \printtext{\bibstring{in}\intitlepunct}}}
+
+\AtEveryBibitem{\clearfield{month}}
+\AtEveryCitekey{\clearfield{month}}
+\AtBeginBibliography{\fontsize{11}{11}\sf}
+\setbeamertemplate{frametitle continuation}{}

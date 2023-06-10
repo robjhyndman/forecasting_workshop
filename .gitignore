@@ -13,3 +13,7 @@
 *.vrb
 .DS_Store
 titlepage.png
+
+/.quarto/
+
+*.tex

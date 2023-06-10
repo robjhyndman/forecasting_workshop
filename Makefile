@@ -1,15 +1,11 @@
-SOURCES=$(shell find . -name *.Rmd)
-SOURCES := $(wildcard *.Rmd)
-TARGETS=$(SOURCES:%.Rmd=%.pdf)
+SOURCES := $(wildcard *.qmd)
+TARGETS=$(SOURCES:%.qmd=%.pdf)
 
-%.pdf: %.Rmd
+%.pdf: %.qmd
 	@echo "$< -> $@"
-	@Rscript -e "rmarkdown::render('$<')"
+	quarto render '$<'
 
-default: $(TARGETS) README.md
-
-README.md: README.qmd
-	quarto render README.qmd
+all: $(TARGETS)
 
 clean:
 	rm -rf $(TARGETS)
