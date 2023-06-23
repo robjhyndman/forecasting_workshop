@@ -6,7 +6,11 @@
     "filters": [
       "rmarkdown/pagebreak.lua"
     ],
-    "includes": {},
+    "includes": {
+      "include-in-header": [
+        "\\usepackage{animate}\n"
+      ]
+    },
     "engineDependencies": {},
     "preserve": null,
     "postProcess": false

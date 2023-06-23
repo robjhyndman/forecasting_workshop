@@ -1,13 +1,9 @@
-SOURCES := $(wildcard *.qmd)
-TARGETS=$(SOURCES:%.qmd=%.pdf)
+default: targets
 
-%.pdf: %.qmd
-	@echo "$< -> $@"
-	quarto render '$<'
-
-all: $(TARGETS)
+targets:
+	Rscript -e "targets::tar_make()"
 
 clean:
-	rm -rf $(TARGETS)
+	Rscript -e "targets::tar_destroy()"
 	rm -rf *_cache
 	rm -rf *_files

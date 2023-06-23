@@ -1,0 +1,14 @@
+name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
+.Random.seed|object|eb2d75daf0fe5f2a|||||||||||||||
+ch0|stem|0d2df51cb7009b3c|dbdb4842ecfa4e4e|d84d7cdd1c3c4b08|-2100252922|0-intro.pdf*0-intro.qmd*setup.R|t19531.3669764257s|a89eddffdd9c598b|1529663|file|local|vector|||19.605||
+ch1|stem|b2d4aaf10420ce40|265dbac97c5a1677|d84d7cdd1c3c4b08|-1860219997|1-tsibbles_files*1-tsibbles.pdf*1-tsibbles.qmd*setup.R|t19531.3448538822s|b2f79d877cc6ce92|2629191|file|local|vector|||28.135||
+ch10|stem|774852c62a63bd23|508fe0c2cda6f4b2|d84d7cdd1c3c4b08|-1569770068|10-reconciliation_files*10-reconciliation.pdf*10-reconciliation.qmd*setup.R|t19531.3667489687s|443038a98de25937|2211504|file|local|vector|||815.079||
+ch2|stem|8a868d46167edb47|9c584d105f4016c3|d84d7cdd1c3c4b08|876515811|2-graphics_files*2-graphics.pdf*2-graphics.qmd*setup.R|t19531.3454175478s|90e9be7a706b85de|4331500|file|local|vector|||48.704||
+ch3|stem|93754a6e0523cf64|d190c063ce170e2a|d84d7cdd1c3c4b08|1234484367|3-transformations_files*3-transformations.pdf*3-transformations.qmd*setup.R|t19531.3461659384s|8d73a3edf320cf4d|3764275|file|local|vector|||64.691||
+ch4|stem|9f766e168980ee56|97980a2ce9e197d1|d84d7cdd1c3c4b08|-908837616|4-decompositions_files*4-decompositions.pdf*4-decompositions.qmd*setup.R|t19531.3473789191s|33d0bd46db4ab4d8|7069916|file|local|vector|||105.021||
+ch5|stem|1f8415df0eb99b6e|2c016bb49e63cf0a|d84d7cdd1c3c4b08|-666445323|5-feasts_files*5-feasts.pdf*5-feasts.qmd*setup.R|t19531.3479805945s|938ed06edce7eb68|1409293|file|local|vector|||51.711||
+ch6|stem|5f54229a755296e9|f8857bb0263cc87f|d84d7cdd1c3c4b08|-564074967|6-fable_files*6-fable.pdf*6-fable.qmd*setup.R|t19531.3484962502s|d64fd499bf6d0541|6672811|file|local|vector|||44.583||
+ch7|stem|701a6c4d886a48e1|3ae50b3abd111a1d|d84d7cdd1c3c4b08|1823179452|7-ets_files*7-ets.pdf*7-ets.qmd*setup.R|t19531.3492044086s|c71ecf036988468b|2451548|file|local|vector|||61.113||
+ch8|stem|28153fd2cdeb0a4e|3344e33f867fd9ae|d84d7cdd1c3c4b08|92484717|8-arima_files*8-arima.pdf*8-arima.qmd*setup.R|t19531.3565484042s|49b3d7c421346400|1397536|file|local|vector|||634.51||
+ch9|stem|18da921d0b3001ae|abf628494c592bbe|d84d7cdd1c3c4b08|330879192|9-dynamic-regression_files*9-dynamic-regression.pdf*9-dynamic-regression.qmd*setup.R|t19531.3572802204s|061f1c8395a811f1|1904580|file|local|vector|||63.237||
+readme|stem|83574a342549ab84|c2c4b6e3bcf05d55|d84d7cdd1c3c4b08|-165896733|README.md*README.qmd|t19531.3573180913s|53c1423f41b697c3|9764|file|local|vector|||3.009||
