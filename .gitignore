@@ -17,3 +17,5 @@ titlepage.png
 /.quarto/
 
 *.tex
+*.fdb_latexmk
+*.synctex.gz

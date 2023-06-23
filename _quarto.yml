@@ -3,9 +3,9 @@ project:
   render:
     - "*.qmd"
 
-pdf-engine: pdflatex
-fig-width: 7.5
-fig-height: 3
+pdf-engine: latexmk
+fig-width: 9
+fig-height: 3.8
 format:
   beamer:
     theme: monash
@@ -18,8 +18,9 @@ format:
 include-in-header: header.tex
 keep-tex: true
 toc: false
+highlight-style: tango
 execute:
-  echo: false
+  echo: true
   message: false
   warning: false
   cache: true

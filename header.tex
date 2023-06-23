@@ -19,7 +19,7 @@
 \setbeamerfont{title}{series=\bfseries,parent=structure,size=\fontsize{24}{24}}
 \ifcsname Shaded\endcsname
   \definecolor{shadecolor}{RGB}{225,225,225}
-  \renewenvironment{Shaded}{\color{black}\fontsize{10}{10}\sf\begin{snugshade}\color{black}}{\end{snugshade}}
+  \renewenvironment{Shaded}{\vspace*{0.15cm}\color{black}\fontsize{10}{10}\sf\begin{snugshade}\color{black}}{\end{snugshade}}
 \fi
 
 % gt dependencies
@@ -59,9 +59,6 @@
 \begin{block}{}\fontsize{10}{11}\sf
 Simulated futures from an ETS model
 \end{block}\end{textblock}}
-\def\fullwidth#1{\centerline{\includegraphics[height=27.1cm,width=16cm,keepaspectratio=true]{#1}}}
-\def\fullheight#1{\centerline{\includegraphics[height=7.65cm,width=25cm,keepaspectratio=true]{#1}}}
-\def\full#1{\centerline{\includegraphics[height=7.7cm,width=15cm,keepaspectratio=true]{#1}}}
 
 \setbeamertemplate{title page}
 {\placefig{-0.01}{-0.01}{width=1.01\paperwidth,height=1.01\paperheight}{NYC.jpg}

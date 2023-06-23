@@ -3,7 +3,10 @@ title: "Tidy Time Series & Forecasting Using R"
 author: "Rob J Hyndman"
 ---
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 ```
 

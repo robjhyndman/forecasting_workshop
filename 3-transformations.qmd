@@ -5,9 +5,12 @@ subtitle: "3. Transformations"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 library(purrr)
 ```
@@ -15,7 +18,6 @@ library(purrr)
 # Per capita adjustments
 
 ## Per capita adjustments
-\fontsize{13}{14}\sf
 
 ```{r gdp-per-capita}
 global_economy |>
@@ -24,7 +26,6 @@ global_economy |>
 ```
 
 ## Per capita adjustments
-\fontsize{13}{14}\sf
 
 ```{r gdp-per-capita2}
 global_economy |>
@@ -48,7 +49,7 @@ print_retail <- aus_retail |>
   group_by(Industry) |>
   index_by(Year = year(Month)) |>
   summarise(Turnover = sum(Turnover))
-aus_economy <- filter(global_economy, Code == "AUS")
+aus_economy <- filter(global_economy, Country == "Australia")
 print_retail |>
   left_join(aus_economy, by = "Year") |>
   mutate(Adj_turnover = Turnover / CPI) |>
@@ -71,7 +72,7 @@ print_retail <- aus_retail |>
   group_by(Industry) |>
   index_by(Year = year(Month)) |>
   summarise(Turnover = sum(Turnover))
-aus_economy <- filter(global_economy, Code == "AUS")
+aus_economy <- filter(tsibbledata::global_economy, Country == "Australia")
 print_retail |>
   left_join(aus_economy, by = "Year") |>
   mutate(Adj_turnover = Turnover / CPI) |>
@@ -121,7 +122,7 @@ food <- aus_retail |>
   summarise(Turnover = sum(Turnover))
 ```
 
-```{r food-plot, echo = FALSE, fig.height=2.8}
+```{r food-plot, echo = FALSE, fig.height=3.8}
 food |> autoplot(Turnover) +
   labs(y = "Turnover ($AUD)")
 ```
@@ -129,7 +130,7 @@ food |> autoplot(Turnover) +
 ## Variance stabilization
 \fontsize{12}{14}\sf
 
-```{r food-sqrt1, echo=TRUE, fig.height=2.8}
+```{r food-sqrt1, echo=TRUE, fig.height=3.8}
 food |> autoplot(sqrt(Turnover)) +
   labs(y = "Square root turnover")
 ```
@@ -137,7 +138,7 @@ food |> autoplot(sqrt(Turnover)) +
 ## Variance stabilization
 \fontsize{12}{14}\sf
 
-```{r food-cbrt, echo=TRUE, fig.height=2.8}
+```{r food-cbrt, echo=TRUE, fig.height=3.8}
 food |> autoplot(Turnover^(1 / 3)) +
   labs(y = "Cube root turnover")
 ```
@@ -145,7 +146,7 @@ food |> autoplot(Turnover^(1 / 3)) +
 ## Variance stabilization
 \fontsize{12}{14}\sf
 
-```{r food-log, echo=TRUE, fig.height=2.8}
+```{r food-log, echo=TRUE, fig.height=3.8}
 food |> autoplot(log(Turnover)) +
   labs(y = "Log turnover")
 ```
@@ -153,12 +154,13 @@ food |> autoplot(log(Turnover)) +
 ## Variance stabilization
 \fontsize{12}{14}\sf
 
-```{r food-inverse, echo=TRUE, fig.height=2.8}
+```{r food-inverse, echo=TRUE, fig.height=3.8}
 food |> autoplot(-1 / Turnover) +
   labs(y = "Inverse turnover")
 ```
 
 ## Box-Cox transformations
+\fontsize{13}{15}\sf
 
 Each of these transformations is close to a member of the
 family of \textbf{Box-Cox transformations}:
@@ -166,9 +168,9 @@ $$w_t = \left\{\begin{array}{ll}
         \text{log}(y_t),      & \quad \lambda = 0; \\
         (\text{sign}(y_t)|y_t|^\lambda-1)/\lambda ,         & \quad \lambda \ne 0.
 \end{array}\right.
-$$\pause
+$$\pause\vspace*{-0.4cm}
 
-* Actually the Bickel-Doksum transformation (allowing for \rlap{$y_t<0$)}
+* Actually the Bickel-Doksum transformation (allowing for $y_t<0$)
 * $\lambda=1$: (No substantive transformation)
 * $\lambda=\frac12$: (Square root plus linear transformation)
 * $\lambda=0$: (Natural logarithm)
@@ -210,8 +212,8 @@ food |>
 ## Box-Cox transformations
 \fontsize{13}{14}\sf
 
-```{r food-bc, echo=TRUE,fig.height=2.8}
-food |> autoplot(box_cox(Turnover, 0.0524)) +
+```{r food-bc, echo=TRUE,fig.height=3.8}
+food |> autoplot(box_cox(Turnover, 0.0895)) +
   labs(y = "Box-Cox transformed turnover")
 ```
 

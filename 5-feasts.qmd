@@ -5,15 +5,15 @@ subtitle: "5. Time series features"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 library(glue)
 library(stringr)
-# Remove "Australia's" from region
-tourism <- tsibble::tourism |>
-  mutate(Region = str_replace(Region, "Australia's ", ""))
 ```
 
 # STL Features
@@ -117,7 +117,7 @@ tourism |> features(Trips, feat_acf)
 # Save pdf figures
 savepdf <- function(file, width = 16, height = 10) {
   fname <<- paste("figs/", file, ".pdf", sep = "")
-  pdf(fname, width = width / 2.54, height = height / 2.54, pointsize = 10)
+  Cairo::CairoPDF(fname, width = width / 2.54, height = height / 2.54, pointsize = 10)
   par(mgp = c(2.2, 0.45, 0), tcl = -0.4, mar = c(3.3, 3.6, 1.1, 1.1))
 }
 endpdf <- function() {

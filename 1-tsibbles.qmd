@@ -5,26 +5,13 @@ subtitle: "1. Introduction to tsibbles"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
 #| cache: false
 source("setup.R")
-global_economy <- global_economy |>
-  select(Year, Country, GDP, Imports, Exports, Population)
-tourism <- tourism |>
-  mutate(
-    State = recode(State,
-      "Australian Capital Territory" = "ACT",
-      "New South Wales" = "NSW",
-      "Northern Territory" = "NT",
-      "Queensland" = "QLD",
-      "South Australia" = "SA",
-      "Tasmania" = "TAS",
-      "Victoria" = "VIC",
-      "Western Australia" = "WA"
-    )
-  )
 ```
 
 # Time series data and tsibbles
@@ -68,24 +55,30 @@ tourism <- tourism |>
 \fontsize{13}{14}\sf
 
 ```r
-# Data manipulation and plotting functions
-library(tidyverse)
-# Time series manipulation
+# Data manipulation
+library(dplyr)
+# Plotting functions
+library(ggplot2)
+# Time and date manipulation
+library(lubridate)
+# Time series class
 library(tsibble)
-# Forecasting functions
-library(fable)
-# Time series graphics and statistics
-library(feasts)
 # Tidy time series data
 library(tsibbledata)
+# Time series graphics and statistics
+library(feasts)
+# Forecasting functions
+library(fable)
 ```
 
 \pause
 
-```{r}
-# All of the above and more
+```r
+# All of the above
 library(fpp3)
 ```
+
+
 
 ## `tsibble` objects
 
@@ -95,37 +88,37 @@ library(fpp3)
 global_economy
 ```
 
-\only<2->{\begin{textblock}{.75}(2.05,3.65)
+\only<2->{\begin{textblock}{.75}(1.65,3.2)
 \begin{alertblock}{}\fontsize{10}{10}\sf Index\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<3->{\begin{textblock}{1.6}(3.12,3.65)
+\only<3->{\begin{textblock}{1.6}(2.72,3.2)
 \begin{alertblock}{}\fontsize{10}{10}\sf Key\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<4>{\begin{textblock}{6.3}(5.2,3.65)
+\only<4>{\begin{textblock}{6.3}(5.2,3.2)
 \begin{alertblock}{}\fontsize{10}{10}\sf Measured variables\phantom{dg}\end{alertblock}
 \end{textblock}}
 
 ## `tsibble` objects
 
-\fontsize{10}{11.3}\sf
+\fontsize{10}{11.2}\sf
 
 ```{r, echo = TRUE}
 tourism
 ```
 
-\only<2->{\begin{textblock}{1.1}(2.,3.65)
+\only<2->{\begin{textblock}{1.1}(1.6,3.13)
 \begin{alertblock}{}\fontsize{10}{10}\sf Index\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<3->{\begin{textblock}{3.8}(3.45,3.65)
+\only<3->{\begin{textblock}{3.8}(3.05,3.13)
 \begin{alertblock}{}\fontsize{10}{10}\sf Keys\phantom{dg}\end{alertblock}
 \end{textblock}}
-\only<4-5>{\begin{textblock}{1.5}(7.55,3.65)
+\only<4>{\begin{textblock}{1.5}(7.15,3.13)
 \begin{alertblock}{}\fontsize{10}{10}\sf Measure\phantom{dg}\end{alertblock}
 \end{textblock}}
 
-\only<5>{\begin{textblock}{3}(9,5)
+\begin{textblock}{3}(9,5)
 \begin{block}{}\fontsize{10}{10}\sf Domestic visitor nights in thousands by state/region and purpose.\phantom{dg}\end{block}
-\end{textblock}}
+\end{textblock}
 
 ## `tsibble` objects
 
@@ -169,6 +162,8 @@ z <- tibble(Month = paste(2019, month.abb[1:5]), Observation = c(50, 23, 34, 30,
 z
 ```
 
+\vspace*{10cm}
+
 ## The `tsibble` index
 
 \begin{block}{}
@@ -182,7 +177,10 @@ z |>
   as_tsibble(index = Month)
 ```
 
+\vspace*{10cm}
+
 ## The `tsibble` index
+\vspace*{-0.2cm}
 
 Common time index variables can be created with these functions:
 
@@ -424,7 +422,7 @@ ansett |>
   autoplot(Passengers)
 ```
 
-\begin{textblock}{2.2}(12.6,7.3)
+\begin{textblock}{2.5}(12.6,7.3)
 \begin{alertblock}{}
 Not the real data! Or is it?
 \end{alertblock}

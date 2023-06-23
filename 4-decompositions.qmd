@@ -5,27 +5,18 @@ subtitle: "4. Seasonality and trends"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 library(purrr)
 library(transformr) # Just to get it on renv
 library(gganimate)
 library(latex2exp)
-tourism <- tourism |>
-  mutate(
-    State = recode(State,
-      "Australian Capital Territory" = "ACT",
-      "New South Wales" = "NSW",
-      "Northern Territory" = "NT",
-      "Queensland" = "QLD",
-      "South Australia" = "SA",
-      "Tasmania" = "TAS",
-      "Victoria" = "VIC",
-      "Western Australia" = "WA"
-    )
-  )
 ```
 
 # Time series decompositions
@@ -106,7 +97,7 @@ components(dcmp)
 
 ## US Retail Employment
 
-```{r usretail-stl, fig.width=8, fig.height=5}
+```{r usretail-stl, fig.width=8, fig.height=4}
 components(dcmp) |> autoplot()
 ```
 

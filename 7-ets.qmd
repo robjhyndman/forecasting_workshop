@@ -5,9 +5,13 @@ subtitle: "7. Exponential smoothing"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 melsyd <- tsibbledata::ansett |>
   filter(Airports == "MEL-SYD")
@@ -151,7 +155,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 
 ```{r holt-fit, echo=TRUE}
 aus_economy <- global_economy |>
-  filter(Code == "AUS") |>
+  filter(Country == "Australia") |>
   mutate(Pop = Population / 1e6)
 fit <- aus_economy |> model(AAN = ETS(Pop))
 report(fit)

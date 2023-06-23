@@ -5,24 +5,13 @@ subtitle: "2. Time series graphics"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
-tourism <- tourism |>
-  mutate(
-    State = recode(State,
-      "Australian Capital Territory" = "ACT",
-      "New South Wales" = "NSW",
-      "Northern Territory" = "NT",
-      "Queensland" = "QLD",
-      "South Australia" = "SA",
-      "Tasmania" = "TAS",
-      "Victoria" = "VIC",
-      "Western Australia" = "WA"
-    )
-  )
 ```
 
 # Seasonal plots
@@ -57,23 +46,20 @@ vic_elec
 ```
 
 ## Multiple seasonal periods
-\fontsize{12}{13}\sf
 
-```{r, dev = "png", dpi = 180}
+```{r, dev = "ragg_png", dpi = 180}
 vic_elec |> gg_season(Demand)
 ```
 
 ## Multiple seasonal periods
-\fontsize{12}{13}\sf
 
-```{r, dev = "png", dpi = 180}
+```{r, dev = "ragg_png", dpi = 180}
 vic_elec |> gg_season(Demand, period = "week")
 ```
 
 ## Multiple seasonal periods
-\fontsize{12}{13}\sf
 
-```{r, dev = "png", dpi = 180}
+```{r, dev = "ragg_png", dpi = 180}
 vic_elec |> gg_season(Demand, period = "day")
 ```
 
@@ -142,8 +128,6 @@ prettify(p1,
   label.padding = unit(0.15, "lines")
 )
 ```
-
-\vspace*{-0.5cm}
 
 * `frame_calendar()` makes a compact calendar plot
 * `facet_calendar()` provides an easier ggplot2 integration.
@@ -257,7 +241,7 @@ The timing of peaks and troughs is predictable with seasonal data, but unpredict
 # Lag plots and autocorrelation
 
 ## Example: Beer production
-\fontsize{11}{12}\sf
+\fontsize{10}{11}\sf
 
 ```{r}
 new_production <- aus_production |>
@@ -268,14 +252,14 @@ new_production
 ## Example: Beer production
 \fontsize{13}{15}\sf
 
-```{r, fig.height=6.5, fig.width=6.5, out.width="8cm"}
+```{r, fig.height=6.5, fig.width=6.5, out.width="7cm"}
 new_production |> gg_lag(Beer)
 ```
 
 ## Example: Beer production
 \fontsize{13}{15}\sf
 
-```{r, fig.height=6.5, fig.width=6.5, out.width="8cm"}
+```{r, fig.height=6.5, fig.width=6.5, out.width="7cm"}
 new_production |> gg_lag(Beer, geom = "point")
 ```
 
@@ -295,8 +279,7 @@ with these scatterplots.
 ## Autocorrelation
 
 Results for first 9 lags for beer data:
-
-\fontsize{11}{13}\sf
+\fontsize{10}{11}\sf
 
 ```{r, echo=TRUE}
 new_production |> ACF(Beer, lag_max = 9)
@@ -305,16 +288,13 @@ new_production |> ACF(Beer, lag_max = 9)
 ## Autocorrelation
 
 Results for first 9 lags for beer data:
-
-\fontsize{11}{13}\sf
+\fontsize{10}{11}\sf
 
 ```{r beeracf, fig.height=2.5}
 new_production |>
   ACF(Beer, lag_max = 9) |>
   autoplot()
 ```
-
-\vspace*{10cm}
 
 ## ACF
 
@@ -325,19 +305,16 @@ new_production |>
 ```
 
 ## Australian holidays
-\fontsize{9}{10}\sf
+\fontsize{10}{11}\sf
 
 ```{r tourismacf}
 holidays |> ACF(Trips)
 ```
 
 ## Australian holidays
-\fontsize{9}{10}\sf
 
-```{r tourismacf2, fig.height=5, fig.width=5, out.width="40%"}
-holidays |>
-  ACF(Trips) |>
-  autoplot()
+```{r tourismacf2, fig.height=5, fig.width=5, out.width="49%"}
+holidays |> ACF(Trips) |> autoplot()
 ```
 
 ## Trend and seasonality in ACF plots
@@ -347,7 +324,6 @@ holidays |>
 - When data are trended and seasonal, you see a combination of these effects.
 
 ## US retail trade employment
-\fontsize{11}{12}\sf
 
 ```{r}
 retail <- us_employment |>
@@ -356,7 +332,6 @@ retail |> autoplot(Employed)
 ```
 
 ## US retail trade employment
-\fontsize{11}{12}\sf
 
 ```{r}
 retail |>
@@ -365,7 +340,7 @@ retail |>
 ```
 
 ## Google stock price
-\fontsize{12}{14}\sf
+\fontsize{10}{11}\sf
 
 ```{r google-2015}
 google_2015 <- gafa_stock |>
@@ -438,8 +413,6 @@ White noise data is uncorrelated across time with zero mean and constant varianc
 \end{alertblock}
 \end{textblock}}
 
-\vspace*{10cm}
-
 ## Example: White noise
 \fontsize{10}{10}\sf
 
@@ -471,13 +444,11 @@ wn |>
   autoplot()
 ```
 
-\pause
+\pause\fontsize{13}{15}\sf
 
  * Sample autocorrelations for white noise series.
  * Expect each autocorrelation to be close to zero.
  * Blue lines show 95% critical values.
-
-\vspace*{10cm}
 
 ## Example: Pigs slaughtered
 

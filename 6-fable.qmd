@@ -5,9 +5,13 @@ subtitle: "6. Introduction to forecasting"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 h02 <- tsibbledata::PBS |>
   filter(ATC2 == "H02") |>

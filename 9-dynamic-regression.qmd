@@ -5,11 +5,14 @@ subtitle: "9. Dynamic regression"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
-
 vic_elec_daily <- vic_elec |>
   filter(year(Time) == 2014) |>
   index_by(Date = date(Time)) |>

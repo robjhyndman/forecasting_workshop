@@ -5,9 +5,12 @@ subtitle: "10. Forecast reconciliation"
 
 ## Outline
 
-\vspace*{0.4cm}\tableofcontents
+\vspace*{0.7cm}\tableofcontents
 
-```{r setup, include=FALSE}
+```{r}
+#| label: setup
+#| include: false
+#| cache: false
 source("setup.R")
 ```
 
@@ -385,7 +388,7 @@ fc |>
 
 ```{r fctourism3, dependson='fctourism', fig.height=2.7}
 fc |>
-  filter(is_aggregated(Purpose) & State == "Victoria" &
+  filter(is_aggregated(Purpose) & State == "VIC" &
     is_aggregated(Region)) |>
   autoplot(tourism_agg, level = 95)
 ```

@@ -1,13 +1,17 @@
 %% This is the Monash beamer theme
 %% Created for Monash Business School
-%% Updated by Rob J Hyndman. 16 April 2023
+%% Updated by Rob J Hyndman. 23 June 2023
 
 \RequirePackage{beamerthememetropolis}
 % Alter the color theme by setting eg 'colortheme: monashblue' in the YAML header
+\beamer@centeredfalse
 
 % Fonts
+%\usepackage[scale=0.85,lf]{FiraMono}
 \usepackage[scale=0.85]{sourcecodepro}
-\usepackage[lf]{FiraSans}
+\usepackage[lf,t]{FiraSans}
+\fontsize{13}{15}\sf
+%\DisableLigatures{encoding = T1, family = tt*}
 
 %% Default color theme
 \usecolortheme{monashwhite}
@@ -24,7 +28,14 @@
 \metroset{progressbar=foot}
 
 % Plenty of room
-%\setbeamersize{text margin left=2em,text margin right=2em}
+\setlength{\metropolis@frametitle@padding}{1.6ex}
+\setbeamertemplate{frametitle}{%
+\nointerlineskip
+\begin{beamercolorbox}[wd=\paperwidth,leftskip=0.3cm,rightskip=0.3cm,ht=2.2ex,dp=1.2ex]{frametitle}
+  \usebeamerfont{frametitle}\MakeLowercase{\protect\insertframetitle}%
+\end{beamercolorbox}%
+\vspace*{-0.2cm}
+}
 
 % Rounded corners on boxes
 \useinnertheme{rounded}
@@ -41,7 +52,7 @@
     \hskip-4ex%
     \hbox to4ex{%
       \hfil%
-      \color{LightGrey}\raisebox{.2ex}{\insertenumlabel}%
+      \color{white}\raisebox{.2ex}{\insertenumlabel}%
       \hfil}%
   }}%
 }
@@ -64,7 +75,7 @@
 \setlength{\TPHorizModule}{1cm}
 \setlength{\TPVertModule}{1cm}
 \def\placefig#1#2#3#4{\begin{textblock}{.1}(#1,#2)\rlap{\includegraphics[#3]{#4}}\end{textblock}}
-\def\full#1{\vspace*{0.05cm}\centerline{\includegraphics[width=15cm,height=7.5cm,keepaspectratio=true]{#1}}}
+\def\full#1{\vspace*{0.15cm}\centerline{\includegraphics[width=15.8cm,height=7.9cm,keepaspectratio=true]{#1}}}
 
 % Monash title page
 % One can alter the font size by setting eg 'titlefontsize: 20pt' in the YAML header
@@ -81,7 +92,7 @@
 
 % Outline at start of each section
 \AtBeginSection[]{
-   \begin{frame}{Outline}\vspace*{0.4cm}
+   \begin{frame}{Outline}\vspace*{0.7cm}
    \tableofcontents[currentsection]
    \end{frame}
   }
@@ -91,13 +102,6 @@
 \setbeamertemplate{section in toc}[square]
 \setbeamerfont{section number projected}{size=\large}
 \setbeamertemplate{section in toc shaded}[default][50]
-
-
-% Redefine shaded environment if it exists (for R plots)
-\ifcsname Shaded\endcsname
-  \definecolor{shadecolor}{RGB}{225,225,225}
-  \renewenvironment{Shaded}{\color{black}\begin{snugshade}\color{black}}{\end{snugshade}}
-\fi
 
 \setbeamertemplate{footline}{%
 \hfill\textcolor[rgb]{0.7,0.7,0.7}{\fbox{\insertframenumber{}}}}
