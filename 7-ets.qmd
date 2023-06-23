@@ -181,7 +181,7 @@ components(fit) |> autoplot()
 
 \fontsize{12}{12}\sf
 
-```{r holt-fc, echo=TRUE, cache=TRUE, dependson='holt-fit', fig.height=2.7}
+```{r holt-fc, echo=TRUE, dependson='holt-fit', fig.height=2.7}
 fit |>
   forecast(h = 20) |>
   autoplot(aus_economy) +
@@ -220,7 +220,7 @@ aus_economy |>
 
 \fontsize{9}{9}\sf
 
-```{r popfit, echo=TRUE, cache=TRUE}
+```{r popfit, echo=TRUE}
 fit <- global_economy |>
   mutate(Pop = Population / 1e6) |>
   model(ets = ETS(Pop))
@@ -230,7 +230,7 @@ fit
 ## Example: National populations
 \fontsize{12}{12}\sf
 
-```{r popfc, echo=TRUE, cache=TRUE, dependson="popfit"}
+```{r popfc, echo=TRUE, dependson="popfit"}
 fit |>
   forecast(h = 5)
 ```

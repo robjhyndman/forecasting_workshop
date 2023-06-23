@@ -682,7 +682,7 @@ augment(fit) |> features(.resid, ljung_box, dof = 0, lag = 10)
 
 ## Training and test sets
 
-```{r traintest, fig.height=1, echo=FALSE, cache=TRUE}
+```{r traintest, fig.height=1, echo=FALSE}
 train <- 1:18
 test <- 19:24
 par(mar = c(0, 0, 0, 0))

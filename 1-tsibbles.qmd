@@ -137,7 +137,7 @@ tourism
 ### Example
 \fontsize{11}{12}\sf
 
-```{r tstable, cache=TRUE}
+```{r tstable}
 mydata <- tsibble(
   year = 2012:2016,
   y = c(123, 39, 78, 52, 110),

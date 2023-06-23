@@ -178,7 +178,7 @@ $$\pause\vspace*{-0.4cm}
 
 ## Box-Cox transformations
 
-```{r food-anim, cache=TRUE, echo=FALSE, fig.show='animate', interval=1/10, message=FALSE, fig.height=5, fig.width=8, aniopts='controls,buttonsize=0.3cm,width=11.5cm'}
+```{r food-anim, echo=FALSE, fig.show='animate', interval=1/10, message=FALSE, fig.height=5, fig.width=8, aniopts='controls,buttonsize=0.3cm,width=11.5cm'}
 library(rlang)
 library(gganimate)
 library(latex2exp)

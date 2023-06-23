@@ -5,12 +5,6 @@ author: "Rob J Hyndman and Mitchell O'Hara-Wild"
 format: markdown
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
-options(digits = 3, width = 75)
-library(tidyverse)
-```
-
 ## Dates
 
 11-12 July 2023

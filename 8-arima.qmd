@@ -146,7 +146,7 @@ MA:& $q =$ order of the moving average part.
 ## Example: National populations
 \fontsize{11}{12}\sf
 
-```{r popfit2, echo=TRUE, cache=TRUE}
+```{r popfit2, echo=TRUE}
 fit <- global_economy |>
   model(arima = ARIMA(Population))
 fit
@@ -155,7 +155,7 @@ fit
 ## Example: National populations
 \fontsize{11}{12}\sf
 
-```{r popfit3, echo=TRUE, cache=TRUE}
+```{r popfit3, echo=TRUE}
 fit |>
   filter(Country == "Australia") |>
   report()
@@ -190,7 +190,7 @@ fit |>
 ## Example: National populations
 \fontsize{9}{9}\sf
 
-```{r popfc2, echo=TRUE, cache=TRUE, fig.height=2.8}
+```{r popfc2, echo=TRUE, fig.height=2.8}
 fit |>
   forecast(h = 10) |>
   filter(Country == "Australia") |>

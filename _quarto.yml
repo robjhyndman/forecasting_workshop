@@ -23,5 +23,5 @@ execute:
   echo: true
   message: false
   warning: false
-  cache: true
+  cache: false
   freeze: true
