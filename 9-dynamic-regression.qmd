@@ -43,7 +43,7 @@ vic_elec_daily <- vic_elec |>
   * In regression, we assume that $\varepsilon_t$ is white noise.
 \vspace*{0.1cm}
 \pause
-\begin{alertblock}{RegARIMA model}\vspace*{-0.2cm}
+\begin{alertblock}{RegARIMA model}\vspace*{-0.7cm}
 \begin{align*}
   y_t &= \beta_0 + \beta_1 x_{1,t} + \dots + \beta_k x_{k,t} + \eta_t,\\
       \eta_t &\sim \text{ARIMA}
@@ -76,6 +76,7 @@ us_change |>
 \fontsize{9}{10}\sf
 
 ```{r usconsump_pairs, fig.height=6, fig.width=8.5, echo=TRUE}
+#| out-width: 70%
 us_change |> as_tibble() |> select(-Quarter) |> GGally::ggpairs()
 ```
 
@@ -85,11 +86,12 @@ us_change |> as_tibble() |> select(-Quarter) |> GGally::ggpairs()
   *  Increase in income does not necessarily translate into instant increase in consumption (e.g., after the loss of a job, it may take a few months for expenses to be reduced to allow for the new circumstances). We will ignore this for now.
 
 ## US personal consumption and income
-\fontsize{11}{11}\sf
+\fontsize{10}{10}\sf
 
 ```{r usconsump2, echo=TRUE, fig.height=3}
 fit <- us_change |>
-  model(regarima = ARIMA(Consumption ~ Income + Production + Savings + Unemployment))
+  model(regarima = ARIMA(Consumption ~ Income + Production + Savings +
+                                                             Unemployment))
 report(fit)
 ```
 
@@ -108,12 +110,12 @@ gg_tsresiduals(fit)
 
 ```{r , echo=TRUE, fig.height=3.7, dependson='usconsump2'}
 augment(fit) |>
-  features(.resid, ljung_box, dof = 6, lag = 12)
+  features(.resid, ljung_box, dof = 2, lag = 12)
 ```
 
 ## US personal consumption and income
 
-```{r usconsump3, echo=TRUE, fig.height=1.9, dependson='usconsump2'}
+```{r usconsump3, echo=TRUE, fig.height=2.4, dependson='usconsump2'}
 us_change_future <- new_data(us_change, 8) |>
   mutate(Income = tail(us_change$Income, 1),
          Production = tail(us_change$Production, 1),
@@ -121,7 +123,8 @@ us_change_future <- new_data(us_change, 8) |>
          Unemployment = tail(us_change$Unemployment, 1))
 forecast(fit, new_data = us_change_future) |>
   autoplot(us_change) +
-  labs(x = "Year", y = "Percentage change", title = "Forecasts from dynamic regression")
+  labs(x = "Year", y = "Percentage change",
+       title = "Forecasts from dynamic regression")
 ```
 
 ## Forecasting
@@ -140,7 +143,7 @@ Model daily electricity demand as a function of temperature using quadratic regr
 
 \fontsize{8}{9}\sf
 
-```{r, echo=TRUE, fig.height=2.2}
+```{r, echo=TRUE, fig.height=2.7}
 vic_elec_daily |>
   ggplot(aes(x = Temperature, y = Demand, colour = Day_Type)) +
   geom_point() +
@@ -150,7 +153,7 @@ vic_elec_daily |>
 ## Daily electricity demand
 \fontsize{8}{9}\sf
 
-```{r, echo=TRUE, fig.height=2.8}
+```{r, echo=TRUE, fig.height=3.2}
 vic_elec_daily |>
   pivot_longer(c(Demand, Temperature)) |>
   ggplot(aes(x = Date, y = value)) +
@@ -477,7 +480,6 @@ report(fit)
 ```
 
 \pause
-\vspace{-1em}
 
 ```{r tvadvertparam, echo=FALSE, dependson='tvadvertagain'}
 # Store coefficients
@@ -491,7 +493,7 @@ gamma1 <- coef["lag(TVadverts)"]
 ```
 
 ###
-\begin{align*}
+\fontsize{13}{13}\sf\vspace*{-0.7cm}\begin{align*}
   y_t &= `r format(intercept, digits=3)` +
          `r format(gamma0, digits=3)` x_t +
          `r format(gamma1, digits=2)` x_{t-1} + \eta_t,\\

@@ -11,11 +11,11 @@
 *.out
 *.snm
 *.vrb
+*.fdb_latexmk
+*.synctex.gz
 .DS_Store
 titlepage.png
 
 /.quarto/
 
-*.tex
-*.fdb_latexmk
-*.synctex.gz
+[0-9]*.tex

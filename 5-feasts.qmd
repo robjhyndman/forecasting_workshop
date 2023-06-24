@@ -41,14 +41,16 @@ tourism |> features(Trips, feat_stl)
 ## Feature extraction and statistics
 \fontsize{8}{9}\sf
 
-```{r features-plot, fig.height=2.7}
+```{r}
+#| label: features-plot
+#| fig-height: 3.6
 tourism |>
   features(Trips, feat_stl) |>
   ggplot(aes(x = trend_strength, y = seasonal_strength_year, col = Purpose)) +
   geom_point() + facet_wrap(vars(State))
 ```
 
-\only<2->{\begin{textblock}{4.7}(9.8,7)
+\only<2->{\begin{textblock}{4.7}(9.8,6.9)
 \begin{alertblock}{}\fontsize{10}{10}\sf
 \begin{itemize}\tightlist
 \item Holidays more seasonal than other travel.
@@ -113,7 +115,11 @@ tourism |> features(Trips, feat_acf)
 
 # Dimension reduction for features
 
-```{r pca, echo=FALSE}
+## Feature extraction and statistics
+
+```{r pca}
+#| echo: false
+#| include: false
 # Save pdf figures
 savepdf <- function(file, width = 16, height = 10) {
   fname <<- paste("figs/", file, ".pdf", sep = "")
@@ -158,26 +164,27 @@ pcs |> ggplot(aes(x = .fittedPC1, y = .fittedPC2, col = Purpose)) +
 endpdf()
 ```
 
-## Feature extraction and statistics
-\fontsize{9}{9}\sf
-
-```{r tourismfeatures, eval=FALSE}
+```{r}
+#| label: tourismfeatures
+#| eval: false
 tourism_features <- tourism |>
   features(Trips, feature_set(pkgs = "feasts"))
 ```
 
-```{r echo=FALSE}
+\fontsize{8}{8}\sf\vspace*{-0.3cm}
+
+```{r}
+#| echo: false
 tourism_features
 ```
 
-\begin{textblock}{4.5}(10.6,1.3)
+\begin{textblock}{4.5}(10.6,.5)
 \begin{alertblock}{}\fontsize{10}{12}\sf
 All features from the feasts package
 \end{alertblock}
 \end{textblock}
 
 ## Feature extraction and statistics
-\fontsize{9}{9}\sf
 
 ```{r pcatable}
 pcs <- tourism_features |>
@@ -186,11 +193,13 @@ pcs <- tourism_features |>
   broom::augment(tourism_features)
 ```
 
+\fontsize{8}{8}\sf\vspace*{-0.3cm}
+
 ```{r echo=FALSE}
 pcs
 ```
 
-\begin{textblock}{4.5}(9.6,1.5)
+\begin{textblock}{4.5}(10.6,.5)
 \begin{alertblock}{}\fontsize{10}{12}\sf
 Principal components based on all features from the feasts package
 \end{alertblock}
@@ -199,7 +208,7 @@ Principal components based on all features from the feasts package
 ## Feature extraction and statistics
 \fontsize{9}{9}\sf
 
-\begin{textblock}{3.3}(.4,3)
+\begin{textblock}{3.3}(1.4,3)
 \begin{alertblock}{}\fontsize{10}{12}\sf
 Principal components based on all features from the feasts package
 \end{alertblock}
@@ -210,13 +219,13 @@ pcs |> ggplot(aes(x=.fittedPC1, y=.fittedPC2)) +
   geom_point() + theme(aspect.ratio=1)
 ```
 
-\placefig{4}{2.6}{height=6.4cm, width=12cm}{pca1}
+\placefig{7}{2.6}{height=6.4cm, width=12cm}{pca1}
 \vspace*{10cm}
 
 ## Feature extraction and statistics
 \fontsize{9}{9}\sf
 
-\begin{textblock}{3.3}(.4,3)
+\begin{textblock}{3.3}(1.4,3)
 \begin{alertblock}{}\fontsize{10}{12}\sf
 Principal components based on all features from the feasts package
 \end{alertblock}
@@ -227,13 +236,13 @@ pcs |> ggplot(aes(x=.fittedPC1, y=.fittedPC2, col=State)) +
   geom_point() + theme(aspect.ratio=1)
 ```
 
-\placefig{4}{2.6}{height=6.4cm, width=12cm}{pca2}
+\placefig{7}{2.6}{height=6.4cm, width=12cm}{pca2}
 \vspace*{10cm}
 
 ## Feature extraction and statistics
 \fontsize{9}{9}\sf
 
-\begin{textblock}{3.3}(.4,3)
+\begin{textblock}{3.3}(1.4,3)
 \begin{alertblock}{}\fontsize{10}{12}\sf
 Principal components based on all features from the feasts package
 \end{alertblock}
@@ -244,8 +253,8 @@ pcs |> ggplot(aes(x=.fittedPC1, y=.fittedPC2, col=Purpose)) +
   geom_point() + theme(aspect.ratio=1)
 ```
 
-\only<1>{\placefig{4}{2.6}{height=6.4cm, width=12cm}{pca3}}
-\only<2>{\placefig{4}{2.6}{height=6.4cm, width=12cm}{pca4}}
+\only<1>{\placefig{7}{2.6}{height=6.4cm, width=12cm}{pca3}}
+\only<2>{\placefig{7}{2.6}{height=6.4cm, width=12cm}{pca4}}
 \vspace*{10cm}
 
 ## Feature extraction and statistics

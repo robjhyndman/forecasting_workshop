@@ -3,6 +3,8 @@ project:
   render:
     - "*.qmd"
 
+date: last-modified
+date-format: D MMMM YYYY
 pdf-engine: latexmk
 fig-width: 9
 fig-height: 3.8
@@ -23,5 +25,5 @@ execute:
   echo: true
   message: false
   warning: false
-  cache: false
+  cache: true
   freeze: true

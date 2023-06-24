@@ -88,6 +88,8 @@ p2 <- tsibble(idx = seq_len(100), sim = 20 + arima.sim(list(ar = c(1.3, -0.7)), 
 gridExtra::grid.arrange(p1, p2, nrow = 1)
 ```
 
+\vspace*{-0.4cm}
+
 * Cyclic behaviour is possible when $p\ge 2$.
 
 ## Moving Average (MA) models
@@ -112,7 +114,7 @@ gridExtra::grid.arrange(p1, p2, nrow = 1)
 
 ## ARIMA models
 
-\begin{block}{Autoregressive Moving Average models:}\vspace*{-0.4cm}
+\begin{block}{Autoregressive Moving Average models:}\vspace*{-0.7cm}
 \begin{align*}
   y_{t} &= c + \phi_{1}y_{t - 1} + \cdots + \phi_{p}y_{t - p} \\
         & \hspace*{2.4cm}\text{} + \theta_{1}\varepsilon_{t - 1} + \cdots + \theta_{q}\varepsilon_{t - q} + \varepsilon_{t}.
@@ -170,12 +172,10 @@ fit |>
 \vspace*{3cm}
 
 ## Understanding ARIMA models
-\fontsize{14}{16}\sf
 
 * If $c=0$ and $d=0$, the long-term forecasts will go to zero.
 * If $c=0$ and $d=1$, the long-term forecasts will go to a non-zero constant.
 * If $c=0$ and $d=2$, the long-term forecasts will follow a straight line.
-
 * If $c\ne0$ and $d=0$, the long-term forecasts will go to the mean of the data.
 * If $c\ne0$ and $d=1$, the long-term forecasts will follow a straight line.
 * If $c\ne0$ and $d=2$, the long-term forecasts will follow a quadratic trend.
@@ -190,7 +190,7 @@ fit |>
 ## Example: National populations
 \fontsize{9}{9}\sf
 
-```{r popfc2, echo=TRUE, fig.height=2.8}
+```{r popfc2, echo=TRUE, fig.height=3.4}
 fit |>
   forecast(h = 10) |>
   filter(Country == "Australia") |>
@@ -208,7 +208,7 @@ fit |>
 \end{alertblock}\pause
 
 \begin{block}{}
-$$\text{AICc} = -2 \log(L) + 2(p+q+k+1)\left[1 + \frac{(p+q+k+2)}{T-p-q-k-2}\right].$$
+\centerline{$\displaystyle \text{AICc} = -2 \log(L) + 2(p+q+k+1)\left[1 + \frac{(p+q+k+2)}{T-p-q-k-2}\right]$}
 where $L$ is the maximised likelihood fitted to the \textit{differenced} data,
 $k=1$ if $c\neq 0$ and $k=0$ otherwise.\pause
 \end{block}
@@ -236,6 +236,183 @@ Step 2:
   Model with lowest AICc becomes current model.
 
 \pause\alert{Repeat Step 2 until no lower AICc can be found.}
+
+## How does ARIMA() work?
+
+```{r ARMAgridsearch, echo=FALSE, message=FALSE, warning=FALSE, fig.asp=1, out.width="60%", fig.width=4, fig.height=4}
+start <- tribble(
+  ~p, ~q,
+  0, 0,
+  1, 0,
+  0, 1,
+  2, 2
+)
+selected <- tribble(
+  ~p, ~q,
+  2, 2,
+  3, 3,
+  4, 2
+)
+griddf <- expand.grid(p = 0:6, q = 0:6) |>
+  as_tibble() |>
+  left_join(start |> mutate(start = TRUE)) |>
+  left_join(selected |> mutate(chosen = TRUE)) |>
+  replace_na(list(start = FALSE, chosen = FALSE)) |>
+  mutate(
+    step = case_when(
+      start ~ 1,
+      (p - selected$p[1])^2 + (q - selected$q[1])^2 <= 2 ~ 2,
+      (p - selected$p[2])^2 + (q - selected$q[2])^2 <= 2 ~ 3,
+      (p - selected$p[3])^2 + (q - selected$q[3])^2 <= 2 ~ 4,
+      TRUE ~ NA_real_
+    )
+  ) |>
+  left_join(selected |>
+    mutate(step = row_number() + 1) |>
+    rename(fromp = p, fromq = q)) |>
+  mutate(step = as.character(step))
+griddf |>
+  ggplot(aes(x = q, y = p)) +
+  geom_point(aes(alpha = 0.2), colour = "gray", size = 5, shape = 19) +
+  geom_segment(aes(x = fromq, y = fromp, xend = q, yend = p, col = step),
+    data = griddf |> filter(step %in% "1"),
+    arrow = arrow(length = unit(0.15, "inches"), type = "open"),
+    size = 1, lineend = "butt"
+  ) +
+  geom_point(aes(col = step),
+    size = 5, shape = 19,
+    data = griddf |> filter(step == "1")
+  ) +
+  geom_point(data = filter(griddf |> filter(step == "1"), chosen), size = 12, shape = 21, stroke = 1.4) +
+  scale_y_reverse(breaks = 0:6) +
+  scale_x_continuous(position = "top", breaks = 0:6) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.x = element_text(size = 12, hjust = 0),
+    axis.title.y = element_text(
+      size = 12, hjust = 1,
+      angle = 0, margin = margin(t = 0, r = 10, b = 0, l = 0)
+    )
+  ) +
+  scale_colour_manual(
+    breaks = paste(1:4),
+    values = c("#D55E00", "#0072B2", "#009E73", "#CC79A7")
+  ) +
+  guides(alpha = FALSE)
+```
+
+## How does ARIMA() work?
+
+```{r ARMAgridsearch2, echo=FALSE, message=FALSE, warning=FALSE, fig.asp=1, out.width="60%", fig.width=4, fig.height=4}
+griddf |>
+  ggplot(aes(x = q, y = p)) +
+  geom_point(aes(alpha = 0.2), colour = "gray", size = 5, shape = 19) +
+  geom_segment(aes(x = fromq, y = fromp, xend = q, yend = p, col = step),
+    data = griddf |> filter(step == "2"),
+    arrow = arrow(length = unit(0.15, "inches"), type = "open"),
+    size = 1, lineend = "butt"
+  ) +
+  geom_point(aes(col = step),
+    size = 5, shape = 19,
+    data = griddf |> filter(step %in% c("1", "2"))
+  ) +
+  geom_point(data = filter(griddf |> filter(step %in% c("1", "2")), chosen), size = 12, shape = 21, stroke = 1.4) +
+  scale_y_reverse(breaks = 0:6) +
+  scale_x_continuous(position = "top", breaks = 0:6) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.x = element_text(size = 12, hjust = 0),
+    axis.title.y = element_text(
+      size = 12, hjust = 1,
+      angle = 0, margin = margin(t = 0, r = 10, b = 0, l = 0)
+    )
+  ) +
+  scale_colour_manual(
+    breaks = paste(1:4),
+    values = c("#D55E00", "#0072B2", "#009E73", "#CC79A7")
+  ) +
+  guides(alpha = FALSE)
+```
+
+## How does ARIMA() work?
+
+```{r ARMAgridsearch3, echo=FALSE, message=FALSE, warning=FALSE, fig.asp=1, out.width="60%", fig.width=4, fig.height=4}
+griddf |>
+  ggplot(aes(x = q, y = p)) +
+  geom_point(aes(alpha = 0.2), colour = "gray", size = 5, shape = 19) +
+  geom_segment(aes(x = fromq, y = fromp, xend = q, yend = p, col = step),
+    data = griddf |> filter(step %in% "3"),
+    arrow = arrow(length = unit(0.15, "inches"), type = "open"),
+    size = 1, lineend = "butt"
+  ) +
+  geom_point(aes(col = step),
+    size = 5, shape = 19,
+    data = griddf |> filter(step %in% c("1", "2", "3"))
+  ) +
+  geom_point(
+    data = griddf |> filter(step %in% c("1", "2", "3"), chosen),
+    size = 12, shape = 21, stroke = 1.4
+  ) +
+  scale_y_reverse(breaks = 0:6) +
+  scale_x_continuous(position = "top", breaks = 0:6) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.x = element_text(size = 12, hjust = 0),
+    axis.title.y = element_text(
+      size = 12, hjust = 1,
+      angle = 0, margin = margin(t = 0, r = 10, b = 0, l = 0)
+    )
+  ) +
+  scale_colour_manual(
+    breaks = paste(1:4),
+    values = c("#D55E00", "#0072B2", "#009E73", "#CC79A7")
+  ) +
+  guides(alpha = FALSE)
+```
+
+## How does ARIMA() work?
+
+```{r ARMAgridsearch4, echo=FALSE, message=FALSE, warning=FALSE, fig.asp=1, out.width="60%", fig.width=4, fig.height=4}
+griddf |>
+  ggplot(aes(x = q, y = p)) +
+  geom_point(aes(alpha = 0.2), colour = "gray", size = 5, shape = 19) +
+  geom_segment(aes(x = fromq, y = fromp, xend = q, yend = p, col = step),
+    data = griddf |> filter(step %in% "4"),
+    arrow = arrow(length = unit(0.15, "inches"), type = "open"),
+    size = 1, lineend = "butt"
+  ) +
+  geom_point(aes(col = step),
+    size = 5, shape = 19,
+    data = griddf |> filter(step %in% c("1", "2", "3", "4"))
+  ) +
+  geom_point(
+    data = griddf |> filter(step %in% c("1", "2", "3", "4"), chosen),
+    size = 12, shape = 21, stroke = 1.4
+  ) +
+  scale_y_reverse(breaks = 0:6) +
+  scale_x_continuous(position = "top", breaks = 0:6) +
+  theme_minimal() +
+  theme(
+    panel.grid.minor = element_blank(),
+    axis.text = element_text(size = 10),
+    axis.title.x = element_text(size = 12, hjust = 0),
+    axis.title.y = element_text(
+      size = 12, hjust = 1,
+      angle = 0, margin = margin(t = 0, r = 10, b = 0, l = 0)
+    )
+  ) +
+  scale_colour_manual(
+    breaks = paste(1:4),
+    values = c("#D55E00", "#0072B2", "#009E73", "#CC79A7")
+  ) +
+  guides(alpha = FALSE)
+```
 
 # Lab Session 16
 ## Lab Session 16
@@ -385,6 +562,7 @@ fit <- train |>
 \fontsize{10}{11}\sf
 
 ```{r trainfc, dependson='trainall'}
+#| fig-height: 3.6
 fc <- fit |> forecast(h = "3 years")
 fc |>
   filter(Region == "Snowy Mountains", Purpose == "Holiday") |>
@@ -421,7 +599,7 @@ accuracy(fc, tourism) |>
 \item Vector of time series features used to predict best weights.
 \item A modification of xgboost is used.
 \item Method came 2nd in the 2018 M4 international forecasting competition.
-\item Main author: Pablo Montero-Manso (Monash U)
+\item Main author: Pablo Montero-Manso (now Uni Sydney)
 \item Not (yet) available for fable.
 \end{itemize}
 \end{block}

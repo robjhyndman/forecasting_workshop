@@ -270,7 +270,7 @@ aligned_plots[[9]] +
 
 \simfutures
 
-\only<2>{\begin{textblock}{8.5}(.3,6.5)\begin{alertblock}{}
+\only<2>{\begin{textblock}{8.5}(.3,6.5)\begin{alertblock}{}\fontsize{13}{15}\sf
 ``He who sees the past as surprise-free is bound to have a future full of surprises.''\\\mbox{}\hfill{\small (Amos Tversky)}
 \end{alertblock}\end{textblock}
 }
@@ -298,7 +298,7 @@ new_production |> autoplot(Beer) +
   )
 ```
 
-\begin{textblock}{7}(0.2,8.7)
+\begin{textblock}{7}(0.4,7.9)
 \begin{alertblock}{}
 \small{How would you forecast these series?}
 \end{alertblock}
@@ -319,7 +319,7 @@ aus_livestock |>
   )
 ```
 
-\begin{textblock}{7}(0.2,8.7)
+\begin{textblock}{7}(0.4,7.9)
 \begin{alertblock}{}
 \small{How would you forecast these series?}
 \end{alertblock}
@@ -333,11 +333,11 @@ gafa_stock |>
   autoplot(Close) +
   labs(
     title = "Facebook closing stock price in 2018",
-    x = NULL, y = "Closing price ($USD)"
+    x = "Date", y = "Closing price ($USD)"
   )
 ```
 
-\begin{textblock}{7}(0.2,8.7)
+\begin{textblock}{7}(0.4,7.9)
 \begin{alertblock}{}
 \small{How would you forecast these series?}
 \end{alertblock}
@@ -351,7 +351,7 @@ gafa_stock |>
   * Forecast of all future values is equal to mean of historical data $\{y_1,\dots,y_T\}$.
   * Forecasts: $\hat{y}_{T+h|T} = \bar{y} = (y_1+\dots+y_T)/T$
 
-```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 2.7}
+```{r mean-method-explained, echo=FALSE, message=FALSE, warning=FALSE, fig.height = 3.4}
 bricks <- aus_production |>
   filter(!is.na(Bricks)) |>
   mutate(average = mean(Bricks))
@@ -377,7 +377,7 @@ bricks |>
   * Forecasts: $\hat{y}_{T+h|T} =y_T$.
   * Consequence of efficient market hypothesis.
 
-```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
+```{r naive-method-explained, echo = FALSE, warning = FALSE, fig.height = 3.4}
 bricks |>
   filter(!is.na(Bricks)) |>
   model(NAIVE(Bricks)) |>
@@ -395,7 +395,7 @@ bricks |>
   * Forecasts equal to last value from same season.
   * Forecasts: $\hat{y}_{T+h|T} =y_{T+h-m(k+1)}$, where $m=$ seasonal period and $k$ is the integer part of $(h-1)/m$.
 
-```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 2.7}
+```{r snaive-method-explained, echo = FALSE, warning = FALSE, fig.height = 3.4}
 bricks |>
   model(SNAIVE(Bricks ~ lag("year"))) |>
   forecast(h = "5 years") |>
@@ -458,7 +458,7 @@ brick_fit <- aus_production |>
 brick_fit
 ```
 
-\vspace*{-0.2cm}\begin{alertblock}{}
+\vspace*{0.2cm}\begin{alertblock}{}
 A \texttt{mable} is a model table, each cell corresponds to a fitted model.
 \end{alertblock}
 
@@ -475,7 +475,7 @@ brick_fc <- brick_fit |>
 print(brick_fc, n = 4)
 ```
 
-\begin{alertblock}{}
+\vspace*{0.2cm}\begin{alertblock}{}
 A \texttt{fable} is a forecast table with point forecasts and distributions.
 \end{alertblock}
 
@@ -483,7 +483,7 @@ A \texttt{fable} is a forecast table with point forecasts and distributions.
 
 \footnotesize
 
-```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=2.6, dependson='brick-fc'}
+```{r brick-fc-plot, warning=FALSE, message=FALSE, fig.height=3.4, dependson='brick-fc'}
 brick_fc |>
   autoplot(aus_production, level = NULL) +
   labs(title = "Forecasts for quarterly clay brick production",
@@ -495,7 +495,8 @@ brick_fc |>
 \fontsize{10}{12}\sf
 
 ```{r brick-fc-interval, dependson='brick-fc'}
-brick_fc |> hilo(level = c(50, 75))
+brick_fc |>
+  hilo(level = c(50, 75))
 ```
 
 ## Prediction intervals
@@ -504,7 +505,7 @@ brick_fc |> hilo(level = c(50, 75))
 ```{r brick-fc-interval2, dependson='brick-fc'}
 brick_fc |>
   hilo(level = c(50, 75)) |>
-  unpack_hilo(c("50%", "75%"))
+  mutate(lower = `50%`$lower, upper = `50%`$upper)
 ```
 
 # Lab Session 11
@@ -569,7 +570,7 @@ augment(fit)
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4, echo=TRUE, warning=FALSE, fig.height=2.5, dependson="augment"}
+```{r dj4, echo=TRUE, warning=FALSE, fig.height=3.4, dependson="augment"}
 augment(fit) |>
   ggplot(aes(x = trading_day)) +
   geom_line(aes(y = Close, colour = "Data")) +
@@ -579,7 +580,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{10}{10}\sf
 
-```{r dj4a, echo=TRUE, warning=FALSE, fig.height=2.5, dependson="augment"}
+```{r dj4a, echo=TRUE, warning=FALSE, fig.height=3.4, dependson="augment"}
 augment(fit) |>
   filter(trading_day > 1100) |>
   ggplot(aes(x = trading_day)) +
@@ -599,7 +600,7 @@ augment(fit) |>
 ## Facebook closing stock price
 \fontsize{11}{11}\sf
 
-```{r dj6, warning=FALSE, fig.height=2.7, dependson="augment"}
+```{r dj6, warning=FALSE, fig.height=3.4, dependson="augment"}
 augment(fit) |>
   ggplot(aes(x = .resid)) +
   geom_histogram(bins = 150) +
@@ -631,34 +632,33 @@ fit |> gg_tsresiduals()
 ```
 
 ## Ljung-Box test
-\fontsize{13}{15}\sf
+\fontsize{12}{13}\sf
 
 Test whether *whole set* of $r_{k}$ values is significantly different from zero set.
 
 \begin{block}{}
 \centerline{$\displaystyle
- Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$\qquad
-where $h=$ max lag and $T=$ \# observations.}
+ Q = T(T+2) \sum_{k=1}^\ell (T-k)^{-1}r_k^2$\qquad
+where $\ell=$ max lag and $T=$ \# observations}
 \end{block}
 
   * If each $r_k$ close to zero, $Q$ will be **small**.
   * If some $r_k$ values large ($+$ or $-$), $Q$ will be **large**.
   * My preferences: $h=10$ for non-seasonal data, $h=2m$ for seasonal data.
-  * If data are WN, $Q \sim \chi^2$ with $(h - K)$ degrees of freedom where $K=$ no.\ parameters in model.
-  * When applied to raw data, set $K=0$.
+  * If data are WN and $T$ large, $Q \sim \chi^2$ with $\ell$ degrees of freedom.
 
 ## Ljung-Box test
 \fontsize{12}{13}\sf
 
 \begin{block}{}
 \centerline{$\displaystyle
- Q = T(T+2) \sum_{k=1}^h (T-k)^{-1}r_k^2$\qquad
-where $h=$ max lag and $T=$ \# observations.}
+ Q = T(T+2) \sum_{k=1}^\ell (T-k)^{-1}r_k^2$\qquad
+where $\ell=$ max lag and $T=$ \# observations.}
 \end{block}
 
 \fontsize{11}{11}\sf
 
-```{r dj9extra, echo=FALSE, fig.height=1.5}
+```{r dj9extra, echo=FALSE, fig.height=1.65}
 augment(fit) |>
   ACF(.resid, lag_max = 10) |>
   autoplot() + labs(title = "ACF of residuals")
@@ -667,8 +667,8 @@ augment(fit) |>
 \vspace*{-0.3cm}
 
 ```{r dj9, echo=TRUE, dependson="augment"}
-# lag=h and dof=K
-augment(fit) |> features(.resid, ljung_box, dof = 0, lag = 10)
+# lag = h
+augment(fit) |> features(.resid, ljung_box, lag = 10)
 ```
 
 # Lab Session 12
@@ -751,51 +751,58 @@ $\pred{y}{T+h}{T}=$ & its forecast based on data up to time $T$. \\
 $e_{T+h} =$  & $y_{T+h} - \pred{y}{T+h}{T}$
 \end{tabular}
 
+\begin{block}{}\vspace*{-0.7cm}
 \begin{align*}
 \text{MAE} &= \text{mean}(|e_{T+h}|) \\[-0.2cm]
 \text{MSE} &= \text{mean}(e_{T+h}^2) \qquad
 &&\text{RMSE} &= \sqrt{\text{mean}(e_{T+h}^2)} \\[-0.1cm]
 \text{MAPE} &= 100\text{mean}(|e_{T+h}|/ |y_{T+h}|)
-\end{align*}\pause\vspace*{-0.4cm}
+\end{align*}\vspace*{-0.9cm}
+\end{block}
+\pause
 
   * MAE, MSE, RMSE are all scale dependent.
   * MAPE is scale independent but is only sensible if $y_t\gg 0$ for all $t$, and $y$ has a natural zero.
 
 ## Measures of forecast accuracy
+\fontsize{13}{15}\sf
 
 \begin{block}{Mean Absolute Scaled Error}
 $$
-\text{MASE} = \text{mean}(|e_{T+h}|/Q)
+  \text{MASE} = \text{mean}(|e_{T+h}|/Q)
 $$
-where $Q$ is a stable measure of the scale of the time series $\{y_t\}$.
-\end{block}
+\end{block} \pause
+
+- For non-seasonal series, scale uses naïve forecasts:
+
+\centerline{$Q = \frac{1}{T-1}\displaystyle\sum_{t=2}^T |y_{t}-y_{t-1}|$}
+
+- For seasonal series, scale uses seasonal naïve forecasts:
+
+\centerline{$Q = \frac{1}{T-m}\displaystyle\sum_{t=m+1}^T |y_{t}-y_{t-m}|$}
+\rightline{where $m$ is the seasonal frequency}\pause
+
 Proposed by Hyndman and Koehler (IJF, 2006).
-
-For non-seasonal time series,
-$$
-  Q = (T-1)^{-1}\sum_{t=2}^T |y_t-y_{t-1}|
-$$
-works well. Then MASE is equivalent to MAE relative to a naïve method.
-
-\vspace*{10cm}
 
 ## Measures of forecast accuracy
+\fontsize{13}{15}\sf
 
-\begin{block}{Mean Absolute Scaled Error}
+\begin{block}{Root Mean Squared Scaled Error}
 $$
-\text{MASE} = \text{mean}(|e_{T+h}|/Q)
+  \text{RMSSE} = \sqrt{\text{mean}(e^2_{T+h}/Q)}
 $$
-where $Q$ is a stable measure of the scale of the time series $\{y_t\}$.
 \end{block}
+
+- For non-seasonal series, scale uses naïve forecasts:
+
+\centerline{$Q = \frac{1}{T-1}\displaystyle\sum_{t=2}^T (y_{t}-y_{t-1})^2$}
+
+- For seasonal series, scale uses seasonal naïve forecasts:
+
+\centerline{$Q = \frac{1}{T-m}\displaystyle\sum_{t=m+1}^T (y_{t}-y_{t-m})^2$}
+\rightline{where $m$ is the seasonal frequencyq}
+
 Proposed by Hyndman and Koehler (IJF, 2006).
-
-For seasonal time series,
-$$
-  Q = (T-m)^{-1}\sum_{t=m+1}^T |y_t-y_{t-m}|
-$$
-works well. Then MASE is equivalent to MAE relative to a seasonal naïve method.
-
-\vspace*{10cm}
 
 ## Measures of forecast accuracy
 

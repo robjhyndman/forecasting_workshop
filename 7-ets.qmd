@@ -52,9 +52,9 @@ melsyd <- tsibbledata::ansett |>
   * Equivalent ETS state space models developed in the 1990s and 2000s.
 
 ## A model for levels, trends, and seasonalities
-\fontsize{13}{14}\sf
+\fontsize{13}{13}\sf
 
-We want a model that captures the level ($\ell_t$), trend ($b_t$) and seasonality ($s_t$).
+We want a model that captures the level ($\ell_t$), trend ($b_t$) and seasonality ($s_t$).\vspace*{-0.1cm}
 
 \alert{How do we combine these elements?}
 
@@ -68,7 +68,7 @@ $y_t = \ell_{t-1}b_{t-1}s_{t-m}(1 + \varepsilon_t)$
 \end{block}\pause
 \begin{block}{Perhaps a mix of both?}
 $y_t = (\ell_{t-1} + b_{t-1}) s_{t-m} + \varepsilon_t$
-\end{block}\pause
+\end{block}\pause\vspace*{-0.1cm}
 
 \alert{How do the level, trend and seasonal components evolve over time?}
 
@@ -93,15 +93,15 @@ $y_t = (\ell_{t-1} + b_{t-1}) s_{t-m} + \varepsilon_t$
 
 ## ETS(A,N,N): SES with additive errors
 
-\begin{block}{}\vspace*{-0.4cm}
+\begin{block}{}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T \\
 \text{Measurement equation}&& y_t &= \ell_{t-1} + \varepsilon_t\\
 \text{State equation}&& \ell_t&=\ell_{t-1}+\alpha \varepsilon_t
 \end{align*}
-\end{block}
-where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
-\pause
+\end{block}\vspace*{-0.4cm}
+
+where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.\pause
 
   * "innovations" or "single source of error" because equations have the same error process, $\varepsilon_t$.
   * Measurement equation: relationship between observations and states.
@@ -111,15 +111,15 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 
 ## ETS(M,N,N): SES with multiplicative errors
 
-\begin{block}{}\vspace*{-0.4cm}
+\begin{block}{}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T \\
 \text{Measurement equation}&& y_t &= \ell_{t-1}(1 + \varepsilon_t)\\
-\text{State equation}&& \ell_t&=\ell_{t-1}(1+\alpha \varepsilon_t)
+\text{State equation}&& \ell_t&=\ell_{t-1} (1+\alpha\varepsilon_t)
 \end{align*}
-\end{block}
-where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
-\pause
+\end{block}\vspace*{-0.4cm}
+
+where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.\pause
 
   * Models with additive and multiplicative errors with the same parameters generate the same point forecasts but different prediction intervals.
 
@@ -130,7 +130,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 ## Holt's linear trend
 \fontsize{13}{15}\sf
 
-\begin{block}{Additive errors: ETS(A,A,N)}\vspace*{-0.4cm}
+\begin{block}{Additive errors: ETS(A,A,N)}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T + hb_T\\
 \text{Measurement equation}&& y_t &= \ell_{t-1}+b_{t-1}+\varepsilon_t\\
@@ -140,7 +140,7 @@ where $\varepsilon_t\sim\text{NID}(0,\sigma^2)$.
 \end{block}
 \pause
 
-\begin{block}{Multiplicative errors: ETS(M,A,N)}\vspace*{-0.4cm}
+\begin{block}{Multiplicative errors: ETS(M,A,N)}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T + hb_T\\
 \text{Measurement equation}&& y_t &= (\ell_{t-1}+b_{t-1})(1+\varepsilon_t)\\
@@ -181,7 +181,7 @@ components(fit) |> autoplot()
 
 \fontsize{12}{12}\sf
 
-```{r holt-fc, echo=TRUE, dependson='holt-fit', fig.height=2.7}
+```{r holt-fc, echo=TRUE, dependson='holt-fit', fig.height=3.4}
 fit |>
   forecast(h = 20) |>
   autoplot(aus_economy) +
@@ -191,7 +191,7 @@ fit |>
 ## ETS(A,Ad,N): Damped trend method
 \fontsize{14}{16}\sf
 
-\begin{block}{Additive errors}\vspace*{-0.2cm}
+\begin{block}{Additive errors}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation}&& \hat{y}_{T+h|T} &= \ell_T + (\phi + \cdots + \phi^{h-1})b_T\\
 \text{Measurement equation}&& y_t &= (\ell_{t-1}+\phi b_{t-1})+\varepsilon_t\\
@@ -209,7 +209,7 @@ fit |>
 ## Example: Australian population
 \fontsize{12}{12}\sf
 
-```{r, echo=TRUE, fig.height=2.7}
+```{r, echo=TRUE, fig.height=3.4}
 aus_economy |>
   model(holt = ETS(Pop ~ trend("Ad"))) |>
   forecast(h = 20) |>
@@ -228,7 +228,7 @@ fit
 ```
 
 ## Example: National populations
-\fontsize{12}{12}\sf
+\fontsize{9}{9}\sf
 
 ```{r popfc, echo=TRUE, dependson="popfit"}
 fit |>
@@ -248,7 +248,7 @@ Experiment with the various options in the `ETS()` function to see how much the 
 
 ## \fontsize{16}{16}\sf\bfseries ETS(A,A,A): Holt-Winters additive method
 
-\begin{block}{}\vspace*{-0.4cm}
+\begin{block}{}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation} && \hat{y}_{t+h|t} &= \ell_{t} + hb_{t} + s_{t+h-m(k+1)}\\
 \text{Observation equation}&& y_t&=\ell_{t-1}+b_{t-1}+s_{t-m} + \varepsilon_t\\
@@ -264,7 +264,7 @@ Experiment with the various options in the `ETS()` function to see how much the 
 
 ## \fontsize{16}{16}\sf\bfseries ETS(M,A,M): Holt-Winters multiplicative method
 
-\begin{block}{}\vspace*{-0.4cm}
+\begin{block}{}\vspace*{-0.7cm}
 \begin{align*}
 \text{Forecast equation} && \hat{y}_{t+h|t} &= (\ell_{t} + hb_{t}) s_{t+h-m(k+1)}\\
 \text{Observation equation}&& y_t&= (\ell_{t-1}+b_{t-1})s_{t-m}(1 + \varepsilon_t)\\
@@ -314,6 +314,7 @@ fit |>
 \fontsize{9}{10}\sf
 
 ```{r ausholidays-components-plot}
+#| fig-height: 3.6
 fit |>
   filter(Region == "Snowy Mountains") |>
   components(fit) |>
@@ -332,7 +333,7 @@ fit |> forecast()
 
 \fontsize{9}{10}\sf
 
-```{r ausholidays-forecast-plot, fig.height=2.5}
+```{r ausholidays-forecast-plot, fig.height=3.4}
 fit |>
   forecast() |>
   filter(Region == "Snowy Mountains") |>
@@ -438,7 +439,7 @@ Find an ETS model for the Gas data from `aus_production`.
 ## Non-Gaussian forecast distributions
 \fontsize{8.8}{9}\sf
 
-```{r cafe, fig.height=2.4}
+```{r cafe, fig.height=3.1}
 vic_cafe <- tsibbledata::aus_retail |>
   filter(State == "Victoria",
          Industry == "Cafes, restaurants and catering services") |>
@@ -500,7 +501,7 @@ sim
 ## Bootstrapped forecast distributions
 \fontsize{8.8}{9}\sf
 
-```{r, fig.height=2.3}
+```{r, fig.height=2.7}
 vic_cafe |>
   filter(year(Month) >= 2008) |>
   ggplot(aes(x = Month)) +
